@@ -8,7 +8,7 @@ from ..utils import Answer, get_straight_len, maybe_apply_reward, apply_ease_cha
 
 def display_success(straightlen: int, easeplus: int):
     MSG = (
-        f"Succeeded {straightlen} times in a row!<br>"
+        f"Succeeded {straightlen} times in a row.<br>"
         f"Gained <b>{easeplus}</b> Ease Factor!"
     )
 
@@ -16,7 +16,7 @@ def display_success(straightlen: int, easeplus: int):
 
 def display_reversal(easeplus):
     MSG = (
-        f"Reversed previous Ease Increase of {easeplus}!"
+        f"Reversed previous Ease Increase of {easeplus}."
     )
 
     tooltip(MSG)
