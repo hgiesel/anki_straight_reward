@@ -1,12 +1,14 @@
 {
-  "settings": [
-    {
-      "deckName": "Default",
-      "lengthOfStraight": 0,
-      "baseEase": 15,
-      "stepEase": 5,
-      "startEase": 130,
-      "stopEase": 250
-    }
-  ]
+  "settings": {
+    "1": [
+      {
+        "deckConfName": "Default",
+        "straightLength": 0,
+        "baseEase": 15,
+        "stepEase": 5,
+        "startEase": 130,
+        "stopEase": 250
+      }
+    ]
+  }
 }

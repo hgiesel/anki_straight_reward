@@ -18,4 +18,4 @@ zip -r "${DIR}/${addon_id}.ankiaddon" \
   "${DIR}/__init__.py" \
   "${DIR}/src/"*".py" \
   "${DIR}/src/lib/"*".py" \
-  "${DIR}/src/gui_config/"*".py" \
+  "${DIR}/src/gui/"*".py" \

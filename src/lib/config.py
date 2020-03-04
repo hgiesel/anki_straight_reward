@@ -2,6 +2,7 @@ import json
 from typing import Optional, List
 from aqt import mw
 from os import path
+from aqt.utils import showInfo
 
 from .config_types import StraightSetting
 
@@ -15,52 +16,65 @@ SCRIPTNAME = path.dirname(path.realpath(__file__))
 with open(path.join(SCRIPTNAME, '../../config.json'), encoding='utf-8') as config:
     config_default = json.load(config)
 
-    SETTINGS_DEFAULT = config_default['settings'][0]
+    SETTINGS_DEFAULT = config_default['settings']['1'][0]
     deck_default = SETTINGS_DEFAULT
 
-    safenav_setting = safenav_preset([deck_default])
+    safenav_setting = safenav_preset(deck_default)
 
 def serialize_setting(setting: StraightSetting) -> dict:
     return {
-        'deckName': setting.deck_name,
-        'lengthOfStraight': setting.length_of_straight,
+        'deckConfName': setting.deck_conf_name,
+        'straightLength': setting.straight_length,
         'baseEase': setting.base_ease,
         'stepEase': setting.step_ease,
         'startEase': setting.start_ease,
         'stopEase': setting.stop_ease,
     }
 
-def deserialize_setting(deck_name, setting_data, access_func = safenav_setting) -> StraightSetting:
-    return setting_data if type(setting_data) == StraightSetting else StraightSetting(
-        deck_name,
-        access_func([setting_data], ['lengthOfStraight']),
+def deserialize_setting(deck_conf_name, setting_data, access_func = safenav_setting) -> StraightSetting:
+    result = setting_data if type(setting_data) == StraightSetting else StraightSetting(
+        deck_conf_name,
+        access_func([setting_data], ['straightLength']),
         access_func([setting_data], ['baseEase']),
         access_func([setting_data], ['stepEase']),
         access_func([setting_data], ['startEase']),
         access_func([setting_data], ['stopEase']),
-
     )
 
-def deserialize_setting_with_default(deck_name, settings):
-    found = filter(lambda v: v['deckName'] == deck_name, settings)
+    return result
+
+def deserialize_setting_with_default(deck_conf_name, settings) -> StraightSetting:
+    found = filter(
+        lambda v: safenav([v], ['deckConfName'], default='') == deck_conf_name,
+        settings,
+    )
 
     try:
-        deck_deserialized = deserialize_setting(deck_name, next(found))
+        deck_deserialized = deserialize_setting(deck_conf_name, next(found))
 
     except StopIteration as e:
-        deck_deserialized = deserialize_setting(deck_name, deck_default)
+        deck_deserialized = deserialize_setting(deck_conf_name, deck_default)
 
     return deck_deserialized
 
+def get_default_setting(deck_conf_name) -> StraightSetting:
+    return deserialize_setting(deck_conf_name, deck_default)
 
-def get_setting(deck_name='Default', current_config = mw.addonManager.getConfig(__name__)) -> Optional[StraightSetting]:
-    return deserialize_setting_with_default(deck_name, safenav([current_config], ['settings'], default=[]))
+def get_setting(deck_conf_name='Default') -> Optional[StraightSetting]:
+    all_config = mw.addonManager.getConfig(__name__)
+    setting = safenav([all_config], ['settings', str(mw.col.crt)], default=[])
+
+    return deserialize_setting_with_default(
+        deck_conf_name,
+        setting,
+    )
 
 def get_settings() -> List[StraightSetting]:
-    current_config = mw.addonManager.getConfig(__name__)
+    all_config = mw.addonManager.getConfig(__name__)
+    setting = safenav([all_config], ['settings', str(mw.col.crt)], default=[])
 
     deck_settings = [
-        get_setting(deck['name'], current_config)
+        get_setting(deck['name'], setting)
         for deck
         in mw.col.decks.decks.values()
     ]
@@ -75,18 +89,36 @@ def write_settings(settings: List[StraightSetting]) -> None:
         in settings
     ]
 
+    all_config = mw.addonManager.getConfig(__name__)
+
+    new_config = safenav([all_config], ['settings'], default={})
+    new_config[str(mw.col.crt)] = serialized_settings
+
     mw.addonManager.writeConfig(__name__, {
-        'settings': serialized_settings,
+        'settings': new_config,
     })
 
 def write_setting(setting: StraightSetting) -> None:
-    current_settings = get_settings()
+    serialized_setting = serialize_setting(setting)
+
+    all_config = mw.addonManager.getConfig(__name__)
+
+    current_config = safenav(
+        [all_config],
+        ['settings', str(mw.col.crt)],
+        default=[],
+    )
+
+    try:
+        idx = next(i for i,v in enumerate(current_config) if v['deckConfName'] == setting.deck_conf_name)
+        current_config[idx] = serialized_setting
+
+    except StopIteration:
+        current_config.append(serialized_setting)
+
+    new_config = safenav([all_config], ['settings'], default={})
+    new_config[str(mw.col.crt)] = current_config
 
     mw.addonManager.writeConfig(__name__, {
-        'settings': [
-            serialize_setting(setting)
-            if sett.deck_name == setting.deck_name
-            else serialize_setting(sett)
-            for sett in current_settings
-        ],
+        'settings': new_config,
     })
