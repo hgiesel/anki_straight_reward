@@ -1,0 +1,3 @@
+= Straight Reward
+
+Based on the link:https://github.com/luminousspice/anki-addons/tree/master/Straight_Reward[add-on of the same name] by link:https://github.com/luminousspice[luminousspice].
