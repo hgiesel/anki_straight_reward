@@ -52,9 +52,9 @@ The review hook increases the ease of cards during the review.
 You will get a notification whenever a success straight is detected.
 The Review hook respects the "Undo" feature.
 
-images::./images/award_notification.png[Award notification]
+image::./images/award_notification.png[Award notification]
 
-images::./images/reversal_notification.png[Reversal notification]
+image::./images/reversal_notification.png[Reversal notification]
 
 === The Sync Hook
 
