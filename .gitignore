@@ -1,0 +1,15 @@
+# Dependency directories
+node_modules/
+.DS_Store
+_Store
+.AppleDouble
+.LSOverride
+.envrc
+
+*.log
+tags
+/build/*
+
+# Specific to this repository
+meta.json
+*.ankiaddon
