@@ -22,7 +22,7 @@ image::./images/setting_menu.png[Setting Menu]
 
 .Formula for calculating the Ease Reward
 ----
-base_reward + step_reward * (strait_length - required_straight_length)
+base_reward + step_reward ⋅ (strait_length - required_straight_length)
 ----
 
 An Example:
@@ -35,10 +35,10 @@ An Example:
 . You have a start ease of 130%
 . You have a stop ease of 270%
 
-So in this case we have a straight success (6 ≥ 4). +
-The formula yields: "15% + 5% ⋅ (6 - 4) = 15% + 10% = 25%" +
-So the answer is final ease is "250% + 25% = 275%". But Wait! +
-275% is more than the stop ease of 270%: So the ease will be set to the maximum ease of 270%.
+So in this case we have a straight success (because 6 ≥ 4). +
+The formula yields: +15% + 5% ⋅ (6 - 4) = 15% + 10% = 25%+ +
+So the answer is final ease is +250% + 25% = 275%+. But Wait! +
++275%+ is more than the stop ease of +270%+: So the ease will be set to the maximum ease of +270%+.
 
 '''
 
@@ -53,6 +53,7 @@ You will get a notification whenever a success straight is detected.
 The Review hook respects the "Undo" feature.
 
 images::./images/award_notification.png[Award notification]
+
 images::./images/reversal_notification.png[Reversal notification]
 
 === The Sync Hook
