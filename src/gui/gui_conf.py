@@ -1,5 +1,6 @@
 from PyQt5 import QtWidgets, Qt, QtCore
 
+from aqt import mw
 from aqt.deckconf import DeckConf
 from aqt.forms import dconf
 from aqt.utils import showInfo
@@ -7,7 +8,11 @@ from aqt.utils import showInfo
 from anki.hooks import wrap
 
 from ..lib.config_types import StraightSetting
-from ..lib.config import get_setting, get_default_setting, write_setting
+from ..lib.config import (
+    get_setting, get_default_setting,
+    write_setting,
+    remove_setting, rename_setting,
+)
 
 def setup_reward_tab(self, Dialog):
     """Add an option tab for Straight Reward at Review section on Deckconf dialog."""
@@ -79,7 +84,7 @@ def setup_reward_tab(self, Dialog):
 
 def load_reward_tab(self):
     """Get the option for Straight Reward."""
-    straight_conf = get_setting(self.conf['name'])
+    straight_conf = get_setting(mw.col, self.conf['name'])
 
     f = self.form
     f.straightLengthSpinBox.setValue(straight_conf.straight_length)
@@ -101,7 +106,7 @@ def save_reward_tab(self):
         f.straightStopEaseSpinBox.value(),
     )
 
-    write_setting(result)
+    write_setting(mw.col, result)
 
 def restore_reward_tab(self):
     straight_conf = get_default_setting(self.conf['name'])
@@ -113,11 +118,49 @@ def restore_reward_tab(self):
     f.straightStartEaseSpinBox.setValue(straight_conf.start_ease)
     f.straightStopEaseSpinBox.setValue(straight_conf.stop_ease)
 
+def remove_straight_setting(self, _old):
+    save_names = {c['name'] for c in mw.col.decks.allConf()}
+
+    _old(self)
+
+    new_names = {c['name'] for c in mw.col.decks.allConf()}
+
+    name_for_deletion = save_names.difference(new_names)
+
+    if len(name_for_deletion) == 1:
+        remove_setting(mw.col, name_for_deletion.pop())
+
+    # otherwise user renamed conf to old name, or reuses name 
+
+# unused
+def rename_straight_setting(self, _old):
+    save_names = {c['name'] for c in mw.col.decks.allConf()}
+
+    _old(self)
+
+    new_names = {c['name'] for c in mw.col.decks.allConf()}
+
+    old_name = save_names.difference(new_names)
+    new_name = new_names.difference(save_names)
+
+    if len(old_name) == 1 and len(new_name) == 1:
+        rename_setting(
+            mw.col,
+            old_name.pop(),
+            new_name.pop(),
+        )
+
+    # otherwise user renamed conf to old name, or reuses name 
+
 def init_conf():
     dconf.Ui_Dialog.setupUi = wrap(dconf.Ui_Dialog.setupUi, setup_reward_tab)
+
     DeckConf.onRestore = wrap(DeckConf.onRestore, restore_reward_tab)
     DeckConf.loadConf = wrap(DeckConf.loadConf, load_reward_tab)
     DeckConf.saveConf = wrap(DeckConf.saveConf, save_reward_tab, 'before')
+
+    DeckConf.remGroup = wrap(DeckConf.remGroup, remove_straight_setting, 'around')
+    DeckConf.renameGroup = wrap(DeckConf.renameGroup, remove_straight_setting, 'around')
 
     # gui_hooks.deck_conf_did_setup_ui_form.append(setup_reward_tab)
     # gui_hooks.deck_conf_did_load_config.append(load_reward_tab)

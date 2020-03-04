@@ -60,29 +60,33 @@ def deserialize_setting_with_default(deck_conf_name, settings) -> StraightSettin
 def get_default_setting(deck_conf_name) -> StraightSetting:
     return deserialize_setting(deck_conf_name, deck_default)
 
-def get_setting(deck_conf_name='Default') -> Optional[StraightSetting]:
+def get_setting(col, deck_conf_name='Default') -> Optional[StraightSetting]:
     all_config = mw.addonManager.getConfig(__name__)
-    setting = safenav([all_config], ['settings', str(mw.col.crt)], default=[])
+    setting = safenav(
+        [all_config],
+        ['settings', str(col.crt)],
+        default=[],
+    )
 
     return deserialize_setting_with_default(
         deck_conf_name,
         setting,
     )
 
-def get_settings() -> List[StraightSetting]:
+def get_settings(col) -> List[StraightSetting]:
     all_config = mw.addonManager.getConfig(__name__)
-    setting = safenav([all_config], ['settings', str(mw.col.crt)], default=[])
+    setting = safenav([all_config], ['settings', str(col.crt)], default=[])
 
     deck_settings = [
-        get_setting(deck['name'], setting)
+        get_setting(col, deck['name'], setting)
         for deck
-        in mw.col.decks.decks.values()
+        in col.decks.decks.values()
     ]
 
     return deck_settings
 
 # write config data to config.json
-def write_settings(settings: List[StraightSetting]) -> None:
+def write_settings(col, settings: List[StraightSetting]) -> None:
     serialized_settings = [
         serialize_setting(setting)
         for setting
@@ -92,20 +96,19 @@ def write_settings(settings: List[StraightSetting]) -> None:
     all_config = mw.addonManager.getConfig(__name__)
 
     new_config = safenav([all_config], ['settings'], default={})
-    new_config[str(mw.col.crt)] = serialized_settings
+    new_config[str(col.crt)] = serialized_settings
 
     mw.addonManager.writeConfig(__name__, {
         'settings': new_config,
     })
 
-def write_setting(setting: StraightSetting) -> None:
+def write_setting(col, setting: StraightSetting) -> None:
     serialized_setting = serialize_setting(setting)
 
     all_config = mw.addonManager.getConfig(__name__)
-
     current_config = safenav(
         [all_config],
-        ['settings', str(mw.col.crt)],
+        ['settings', str(col.crt)],
         default=[],
     )
 
@@ -117,7 +120,65 @@ def write_setting(setting: StraightSetting) -> None:
         current_config.append(serialized_setting)
 
     new_config = safenav([all_config], ['settings'], default={})
-    new_config[str(mw.col.crt)] = current_config
+    new_config[str(col.crt)] = current_config
+
+    mw.addonManager.writeConfig(__name__, {
+        'settings': new_config,
+    })
+
+def rename_setting(col, old_name: str, new_name: str) -> None:
+    all_config = mw.addonManager.getConfig(__name__)
+
+    current_config = safenav(
+        [all_config],
+        ['settings', str(col.crt)],
+        default=[],
+    )
+
+    found = filter(
+        lambda v: safenav([v], [1, 'deckConfName'], default='') == old_name,
+        enumerate(current_config),
+    )
+
+    try:
+        conf_for_rename = next(found)
+        current_config[conf_for_rename[0]]['deckConfName'] = new_name
+
+    except StopIteration as e:
+        pass
+
+    new_config = safenav([all_config], ['settings'], default={})
+    new_config[str(col.crt)] = current_config
+
+    mw.addonManager.writeConfig(__name__, {
+        'settings': new_config,
+    })
+
+def remove_setting(col, conf_name: str) -> None:
+    showInfo(conf_name)
+    all_config = mw.addonManager.getConfig(__name__)
+ 
+    current_config = safenav(
+        [all_config],
+        ['settings', str(col.crt)],
+        default=[],
+    )
+
+    found = filter(
+        lambda v: safenav([v], [1, 'deckConfName'], default='') == conf_name,
+        enumerate(current_config),
+    )
+
+    try:
+        conf_for_deletion = next(found)
+        del current_config[conf_for_deletion[0]]
+        showInfo(conf_name + ' ::: ' + str(conf_for_deletion))
+
+    except StopIteration as e:
+        pass
+
+    new_config = safenav([all_config], ['settings'], default={})
+    new_config[str(col.crt)] = current_config
 
     mw.addonManager.writeConfig(__name__, {
         'settings': new_config,

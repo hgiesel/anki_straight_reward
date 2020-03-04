@@ -2,20 +2,9 @@ from aqt import mw, gui_hooks
 from aqt.utils import showInfo, tooltip
 from anki.cards import Card
 
-from ..main import get_straight_len
-from ..utils import Answer
+from .config import get_setting
 
-from .config import get_setting, write_setting
-
-
-def apply_ease_change(card, reward: int):
-    """Increase ease factor as reward for straight"""
-    oldfactor = card.factor
-    card.factor = min(9990, max(1300, card.factor + reward * 10))
-
-    card.flushSched()
-
-    return int((card.factor - oldfactor)/10)
+from ..utils import Answer, get_straight_len, apply_ease_change
 
 def display_success(straightlen: int, easeplus: int):
     MSG = (
@@ -38,7 +27,7 @@ def apply_strait_reward(_reviewer, card, answer: Answer):
     straightlen = get_straight_len(mw.col, card.id)
 
     conf = mw.col.decks.confForDid(card.did)
-    sett = get_setting(conf['name'])
+    sett = get_setting(mw.col, conf['name'])
 
     if (
         sett.straight_length >= 1 and
