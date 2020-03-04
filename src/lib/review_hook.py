@@ -1,10 +1,10 @@
 from aqt import mw, gui_hooks
-from aqt.utils import showInfo, tooltip
+from aqt.utils import tooltip
 from anki.cards import Card
 
 from .config import get_setting
 
-from ..utils import Answer, get_straight_len, apply_ease_change
+from ..utils import Answer, get_straight_len, maybe_apply_reward, apply_ease_change
 
 def display_success(straightlen: int, easeplus: int):
     MSG = (
@@ -21,42 +21,33 @@ def display_reversal(easeplus):
 
     tooltip(MSG)
 
-latest_info = None
+latest_info = {}
 
-def apply_strait_reward(_reviewer, card, answer: Answer):
+def check_for_straight_reward(_reviewer, card, answer: Answer):
     straightlen = get_straight_len(mw.col, card.id)
 
     conf = mw.col.decks.confForDid(card.did)
     sett = get_setting(mw.col, conf['name'])
 
-    if (
-        sett.straight_length >= 1 and
-        straightlen >= sett.straight_length and
-        (sett.start_ease * 10) < card.factor < (sett.stop_ease * 10)
-    ):
-        easeplus = apply_ease_change(
-            card,
-            sett.base_ease + (straightlen - sett.straight_length) * sett.step_ease,
-        )
+    easeplus = maybe_apply_reward(sett, straightlen, card)
 
-        global latest_info
-        latest_info = (
-            card.id,
-            easeplus,
-        )
-
+    if easeplus:
+        latest_info[card.id] = easeplus
         display_success(straightlen, easeplus)
+
+    elif card.id in latest_info:
+        del latest_info[card.id]
 
 def reverse_strait_reward(cardid: int):
     global latest_info
     card = Card(mw.col, cardid)
 
-    if latest_info and latest_info[0] == cardid:
-        apply_ease_change(card, -latest_info[1])
-        display_reversal(latest_info[1])
+    if cardid in latest_info:
+        apply_ease_change(card, -latest_info[cardid])
+        display_reversal(latest_info[cardid])
 
-    latest_info = None
+        del latest_info[cardid]
 
 def init_review_hook():
-    gui_hooks.reviewer_did_answer_card.append(apply_strait_reward)
+    gui_hooks.reviewer_did_answer_card.append(check_for_straight_reward)
     gui_hooks.review_did_undo.append(reverse_strait_reward)

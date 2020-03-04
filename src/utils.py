@@ -3,7 +3,7 @@ from PyQt5 import QtWidgets, Qt
 from enum import IntEnum
 from sys import maxsize
 from itertools import takewhile
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 version = "v0.1"
 
@@ -49,3 +49,19 @@ def apply_ease_change(card, reward: int):
     card.flushSched()
 
     return int((card.factor - oldfactor)/10)
+
+def maybe_apply_reward(sett, straightlen, card) -> Optional[Tuple[int, int]]:
+    if (
+        sett.straight_length >= 1 and
+        straightlen >= sett.straight_length and
+        (sett.start_ease * 10) <= card.factor <= (sett.stop_ease * 10)
+    ):
+        easeplus = apply_ease_change(
+            card,
+            sett.base_ease + (straightlen - sett.straight_length) * sett.step_ease,
+        )
+
+        # easeplus of 0 will react similiar to None
+        return easeplus
+
+    return None

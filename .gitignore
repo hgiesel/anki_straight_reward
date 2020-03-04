@@ -9,6 +9,7 @@ _Store
 *.log
 tags
 /build/*
+/user_files/*
 
 # Specific to this repository
 meta.json
