@@ -35,9 +35,9 @@ An Example:
 . You have a start ease of 130%
 . You have a stop ease of 270%
 
-So in this case we have a straight success (6 ≥ 4).
-The formula yields: "15% + 5% ⋅ (6 - 4) = 15% + 10% = 25%"
-So the answer is final ease is "250% + 25% = 275%". But Wait!
+So in this case we have a straight success (6 ≥ 4). +
+The formula yields: "15% + 5% ⋅ (6 - 4) = 15% + 10% = 25%" +
+So the answer is final ease is "250% + 25% = 275%". But Wait! +
 275% is more than the stop ease of 270%: So the ease will be set to the maximum ease of 270%.
 
 '''
@@ -46,14 +46,14 @@ So the answer is final ease is "250% + 25% = 275%". But Wait!
 
 The addon knows two mechanisms to detect cards which apply for an ease reward:
 
-. the review hook
-. the sync hook
-
 === The Review Hook
 
 The review hook increases the ease of cards during the review.
 You will get a notification whenever a success straight is detected.
 The Review hook respects the "Undo" feature.
+
+images::./images/award_notification.png[Award notification]
+images::./images/reversal_notification.png[Reversal notification]
 
 === The Sync Hook
 
@@ -68,13 +68,15 @@ If you're on a mobile platform, and...
 
 . you rate a card "Good", and then a few days later...
 . you sync it "Hard", and then another few days later...
-. you sync to Anki Desktop, _no ease reward_ can be applied for the first "Good" rating.
+. you sync to Anki Desktop, _*no ease reward*_ can be applied for the first "Good" rating.
 
 If you're on a mobile platform, and...
 
 . you rate a card "Good", and then a few days later...
 . you sync it "Good", and then another few days later...
-. you sync to Anki Desktop, _only one ease reward_ might be applied for the second "Good" rating, the first one will be ignored.
+. you sync to Anki Desktop, _*only one ease reward*_ might be applied for the second "Good" rating; the first one will be ignored.
 
-Both of these problems can be avoided, if you just sync often enough.
+Both of these problems can be avoided, if you just sync back to Desktop often enough.
 I think once a week would already enough to encounter neither of these issues.
+
+All ease changes applied through the sync hook are logged in the addon folder under `user_files/sync_log`.
