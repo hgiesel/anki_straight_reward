@@ -2,7 +2,6 @@ import json
 from typing import Optional, List
 from aqt import mw
 from os import path
-from aqt.utils import showInfo
 
 from .config_types import StraightSetting
 
@@ -155,9 +154,8 @@ def rename_setting(col, old_name: str, new_name: str) -> None:
     })
 
 def remove_setting(col, conf_name: str) -> None:
-    showInfo(conf_name)
     all_config = mw.addonManager.getConfig(__name__)
- 
+
     current_config = safenav(
         [all_config],
         ['settings', str(col.crt)],
@@ -172,7 +170,6 @@ def remove_setting(col, conf_name: str) -> None:
     try:
         conf_for_deletion = next(found)
         del current_config[conf_for_deletion[0]]
-        showInfo(conf_name + ' ::: ' + str(conf_for_deletion))
 
     except StopIteration as e:
         pass

@@ -3,7 +3,6 @@ from PyQt5 import QtWidgets, Qt, QtCore
 from aqt import mw
 from aqt.deckconf import DeckConf
 from aqt.forms import dconf
-from aqt.utils import showInfo
 
 from anki.hooks import wrap
 

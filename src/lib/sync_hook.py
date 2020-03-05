@@ -6,7 +6,7 @@ from pathlib import Path
 from datetime import datetime
 
 from aqt import mw
-from aqt.utils import showInfo, tooltip
+from aqt.utils import tooltip
 from aqt.addons import AddonManager
 
 from .config import get_setting
