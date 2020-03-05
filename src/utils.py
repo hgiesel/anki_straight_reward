@@ -19,13 +19,13 @@ class RevlogType(IntEnum):
     RELRN = 2
     EARLYREV = 3
 
-def review_success(v: Tuple[RevlogType, Answer]):
+def review_success(v: Tuple[RevlogType, Answer]) -> bool:
     return (
         v[0] in [RevlogType.REV, RevlogType.EARLYREV] and
         v[1] in [Answer.GOOD, Answer.EASY]
     )
 
-def straight_len(lst: List[Tuple[RevlogType, Answer]]):
+def straight_len(lst: List[Tuple[RevlogType, Answer]]) -> int:
     straight = takewhile(review_success, lst)
     straight_length = len(list(straight))
 
