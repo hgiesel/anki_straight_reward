@@ -4,6 +4,7 @@
       {
         "deckConfName": "Default",
         "straightLength": 0,
+        "enableNotifications": true,
         "baseEase": 15,
         "stepEase": 5,
         "startEase": 130,

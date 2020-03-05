@@ -30,49 +30,57 @@ def setup_reward_tab(self, Dialog):
     self.straightLengthSpinBox.setMaximum(100)
     self.gridLayout_straight.addWidget(self.straightLengthSpinBox, 1, 1, 1, 2)
 
+    ##### ENABLE NOTIFICATIONS
+    self.straightEnableNotificationsLabel = QtWidgets.QLabel(w)
+    self.straightEnableNotificationsLabel.setText(_('Enable notifications'))
+    self.gridLayout_straight.addWidget(self.straightEnableNotificationsLabel, 2, 0, 1, 1)
+
+    self.straightEnableNotificationsCheckBox = QtWidgets.QCheckBox(w)
+    self.gridLayout_straight.addWidget(self.straightEnableNotificationsCheckBox, 2, 1, 1, 2)
+
     ##### BASE EASE
     self.straightBaseEaseLabel = QtWidgets.QLabel(w)
     self.straightBaseEaseLabel.setText(_('Base ease reward'))
-    self.gridLayout_straight.addWidget(self.straightBaseEaseLabel, 2, 0, 1, 1)
+    self.gridLayout_straight.addWidget(self.straightBaseEaseLabel, 3, 0, 1, 1)
 
     self.straightBaseEaseSpinBox = QtWidgets.QSpinBox(w)
     self.straightBaseEaseSpinBox.setSuffix('%')
     self.straightBaseEaseSpinBox.setMinimum(0)
     self.straightBaseEaseSpinBox.setMaximum(999)
-    self.gridLayout_straight.addWidget(self.straightBaseEaseSpinBox, 2, 1, 1, 2)
+    self.gridLayout_straight.addWidget(self.straightBaseEaseSpinBox, 3, 1, 1, 2)
 
     ##### STEP EASE
     self.straightStepEaseLabel = QtWidgets.QLabel(w)
     self.straightStepEaseLabel.setText(_('Step ease reward'))
-    self.gridLayout_straight.addWidget(self.straightStepEaseLabel, 3, 0, 1, 1)
+    self.gridLayout_straight.addWidget(self.straightStepEaseLabel, 4, 0, 1, 1)
 
     self.straightStepEaseSpinBox = QtWidgets.QSpinBox(w)
     self.straightStepEaseSpinBox.setSuffix('%')
     self.straightStepEaseSpinBox.setMinimum(0)
     self.straightStepEaseSpinBox.setMaximum(999)
-    self.gridLayout_straight.addWidget(self.straightStepEaseSpinBox, 3, 1, 1, 2)
+    self.gridLayout_straight.addWidget(self.straightStepEaseSpinBox, 4, 1, 1, 2)
 
     ##### START EASE
     self.straightStartEaseLabel = QtWidgets.QLabel(w)
     self.straightStartEaseLabel.setText(_('Start at ease'))
-    self.gridLayout_straight.addWidget(self.straightStartEaseLabel, 4, 0, 1, 1)
+    self.gridLayout_straight.addWidget(self.straightStartEaseLabel, 5, 0, 1, 1)
 
     self.straightStartEaseSpinBox = QtWidgets.QSpinBox(w)
     self.straightStartEaseSpinBox.setSuffix('%')
     self.straightStartEaseSpinBox.setMinimum(130)
     self.straightStartEaseSpinBox.setMaximum(999)
-    self.gridLayout_straight.addWidget(self.straightStartEaseSpinBox, 4, 1, 1, 2)
+    self.gridLayout_straight.addWidget(self.straightStartEaseSpinBox, 5, 1, 1, 2)
 
     ##### STOP EASE
     self.straightStopEaseLabel = QtWidgets.QLabel(w)
     self.straightStopEaseLabel.setText(_('Stop at ease'))
-    self.gridLayout_straight.addWidget(self.straightStopEaseLabel, 5, 0, 1, 1)
+    self.gridLayout_straight.addWidget(self.straightStopEaseLabel, 6, 0, 1, 1)
 
     self.straightStopEaseSpinBox = QtWidgets.QSpinBox(w)
     self.straightStopEaseSpinBox.setSuffix('%')
     self.straightStopEaseSpinBox.setMinimum(130)
     self.straightStopEaseSpinBox.setMaximum(999)
-    self.gridLayout_straight.addWidget(self.straightStopEaseSpinBox, 5, 1, 1, 2)
+    self.gridLayout_straight.addWidget(self.straightStopEaseSpinBox, 6, 1, 1, 2)
 
     ##### VERTICAL SPACER
     verticalSpacer = QtWidgets.QSpacerItem(20, 150, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
@@ -87,6 +95,7 @@ def load_reward_tab(self):
 
     f = self.form
     f.straightLengthSpinBox.setValue(straight_conf.straight_length)
+    f.straightEnableNotificationsCheckBox.setChecked(straight_conf.enable_notifications)
     f.straightBaseEaseSpinBox.setValue(straight_conf.base_ease)
     f.straightStepEaseSpinBox.setValue(straight_conf.step_ease)
     f.straightStartEaseSpinBox.setValue(straight_conf.start_ease)
@@ -99,6 +108,7 @@ def save_reward_tab(self):
     result = StraightSetting(
         self.conf['name'],
         f.straightLengthSpinBox.value(),
+        f.straightEnableNotificationsCheckBox.isChecked(),
         f.straightBaseEaseSpinBox.value(),
         f.straightStepEaseSpinBox.value(),
         f.straightStartEaseSpinBox.value(),

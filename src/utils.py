@@ -5,7 +5,7 @@ from sys import maxsize
 from itertools import takewhile
 from typing import List, Tuple, Optional
 
-version = "v0.1"
+version = "v0.2"
 
 class Answer(IntEnum):
     AGAIN = 1
@@ -41,10 +41,10 @@ def get_straight_len(col, card_id: int):
 
     return straight_len(eases.fetchall())
 
-def apply_ease_change(card, reward: int):
+def apply_ease_change(card, reward: int, sett_min: int, sett_max: int):
     """Increase ease factor as reward for straight"""
     oldfactor = card.factor
-    card.factor = min(9990, max(1300, card.factor + reward * 10))
+    card.factor = min(9990, sett_min, max(1300, sett_max, card.factor + reward * 10))
 
     card.flushSched()
 
@@ -53,12 +53,13 @@ def apply_ease_change(card, reward: int):
 def maybe_apply_reward(sett, straightlen, card) -> Optional[Tuple[int, int]]:
     if (
         sett.straight_length >= 1 and
-        straightlen >= sett.straight_length and
-        (sett.start_ease * 10) <= card.factor <= (sett.stop_ease * 10)
+        straightlen >= sett.straight_length
     ):
         easeplus = apply_ease_change(
             card,
             sett.base_ease + (straightlen - sett.straight_length) * sett.step_ease,
+            sett.start_ease * 10,
+            sett.stop_ease * 10,
         )
 
         # easeplus of 0 will react similiar to None

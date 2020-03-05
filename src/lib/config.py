@@ -23,6 +23,7 @@ with open(path.join(SCRIPTNAME, '../../config.json'), encoding='utf-8') as confi
 def serialize_setting(setting: StraightSetting) -> dict:
     return {
         'deckConfName': setting.deck_conf_name,
+        'enableNotifications': setting.enable_notifications,
         'straightLength': setting.straight_length,
         'baseEase': setting.base_ease,
         'stepEase': setting.step_ease,
@@ -34,6 +35,7 @@ def deserialize_setting(deck_conf_name, setting_data, access_func = safenav_sett
     result = setting_data if type(setting_data) == StraightSetting else StraightSetting(
         deck_conf_name,
         access_func([setting_data], ['straightLength']),
+        access_func([setting_data], ['enableNotifications']),
         access_func([setting_data], ['baseEase']),
         access_func([setting_data], ['stepEase']),
         access_func([setting_data], ['startEase']),

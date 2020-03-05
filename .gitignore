@@ -12,5 +12,5 @@ tags
 /user_files/*
 
 # Specific to this repository
-meta.json
+/meta.json
 *.ankiaddon
