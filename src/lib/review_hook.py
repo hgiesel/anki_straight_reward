@@ -48,7 +48,7 @@ def reverse_strait_reward(cardid: int):
     sett = get_setting(mw.col, conf['name'])
 
     if cardid in latest_info:
-        force_ease_change(card, -latest_info[cardid])
+        force_ease_change(card, -latest_info[cardid] * 10)
 
         if sett.enable_notifications:
             display_reversal(latest_info[cardid])
