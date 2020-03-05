@@ -15,6 +15,7 @@ rm -f "${DIR}/${addon_id}.ankiaddon"
 zip -r "${DIR}/${addon_id}.ankiaddon" \
   "${DIR}/config."{json,md} \
   "${DIR}/manifest.json" \
+  "${DIR}/user_files/README.md" \
   "${DIR}/__init__.py" \
   "${DIR}/src/"*".py" \
   "${DIR}/src/lib/"*".py" \
