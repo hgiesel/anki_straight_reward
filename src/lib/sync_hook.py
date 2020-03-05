@@ -11,7 +11,7 @@ from aqt.addons import AddonManager
 
 from .config import get_setting
 
-from ..utils import get_straight_len, apply_ease_change, maybe_apply_reward
+from ..utils import get_straight_len, maybe_apply_reward
 
 # mw is not accessible during sync
 base_path = mw.addonManager._userFilesPath(__name__.split('.')[0])

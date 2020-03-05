@@ -4,7 +4,7 @@ from anki.cards import Card
 
 from .config import get_setting
 
-from ..utils import Answer, get_straight_len, maybe_apply_reward, apply_ease_change
+from ..utils import Answer, get_straight_len, maybe_apply_reward, force_ease_change
 
 def display_success(straightlen: int, easeplus: int):
     MSG = (
@@ -33,7 +33,9 @@ def check_for_straight_reward(_reviewer, card, answer: Answer):
 
     if easeplus:
         latest_info[card.id] = easeplus
-        display_success(straightlen, easeplus)
+
+        if sett.enable_notifications:
+            display_success(straightlen, easeplus)
 
     elif card.id in latest_info:
         del latest_info[card.id]
@@ -42,9 +44,14 @@ def reverse_strait_reward(cardid: int):
     global latest_info
     card = Card(mw.col, cardid)
 
+    conf = mw.col.decks.confForDid(card.did)
+    sett = get_setting(mw.col, conf['name'])
+
     if cardid in latest_info:
-        apply_ease_change(card, -latest_info[cardid])
-        display_reversal(latest_info[cardid])
+        force_ease_change(card, -latest_info[cardid])
+
+        if sett.enable_notifications:
+            display_reversal(latest_info[cardid])
 
         del latest_info[cardid]
 
