@@ -2,7 +2,7 @@ declare DIR=${BASH_SOURCE%/*}
 
 if [[ "$1" == '-a' ]]; then
   # for uploading to AnkiWeb
-  declare addon_id='??'
+  declare addon_id='957961234'
 else
   # for installing myself
   declare addon_id='straight_reward'
