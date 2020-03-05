@@ -76,8 +76,5 @@ def check_cardids_for_straights(self, _chunk):
     cardids_for_straight_check.clear()
 
 def init_sync_hook():
-
-    # a = aqt.addons.AddonManager(mw)
-    # pp((a.allAddons()))
     Syncer.mergeRevlog = wrap(Syncer.mergeRevlog, check_mobile, pos='before')
     Syncer.applyChunk = wrap(Syncer.applyChunk, check_cardids_for_straights, pos='after')
