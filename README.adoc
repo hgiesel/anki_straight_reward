@@ -42,19 +42,22 @@ So the answer is final ease is +250% + 25% = 275%+. But Wait! +
 
 '''
 
-== Deteching Straight Successes
+== Detecting Straight Successes
 
 The addon knows two mechanisms to detect cards which apply for an ease reward:
 
 === The Review Hook
 
 The review hook increases the ease of cards during the review.
-You will get a notification whenever a success straight is detected.
-The Review hook respects the "Undo" feature.
+You will get a notification whenever a success straight is detected:
 
-image::./images/award_notification.png[Award notification]
+.Award notification
+image::./images/award_notification.png[align="center"]
 
-image::./images/reversal_notification.png[Reversal notification]
+The Review hook respects the "Undo" feature:
+
+.Reversal notification
+image::./images/reversal_notification.png[align="center"]
 
 === The Sync Hook
 
