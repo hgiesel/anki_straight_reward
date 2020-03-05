@@ -4,45 +4,25 @@ This addon increases the ease of Anki cards for which you consecutively have ans
 Such an answer is considered a "success".
 If you have successes often enough to apply for an ease increase, it is considered "straight success".
 
-<b>Setting the Options</a>
+<b>Setting the Options</b>
 
 After installing the addon you will another option tab under the deck options called "Straight Rewards":
 
-<img src="https://raw.githubusercontent.com/hgiesel/anki_straight_reward/master/images/setting_menu.png">Award notification</img>
+<img src="https://raw.githubusercontent.com/hgiesel/anki_straight_reward/master/images/setting_menu.png"></img>
 
-<ul>
-  <li><b>Begin at straight of length</b>: Length of what is considered a straight success. At this length, ease rewards will be applied. The value is the same as deactivating Straight Rewards. (default: 0)</li>
-  <li><b>Base ease reward</b>: One of the two values for calculating the ease reward. (default: 15)</li>
-  <li><b>Step ease reward</b>: One of the two values for calculating the ease reward. (default: 5)</li>
-  <li><b>Start at ease</b>: Only cards with an ease factor between (inclusive) "Start Ease" and "Stop Ease" are considered for ease rewards. (default: 130)</li>
-  <li><b>Stop at ease</b>: Only cards with an ease factor between (inclusive) "Start Ease" and "Stop Ease" are considered for ease rewards. (default: 250)</li>
-</ul>
-
+<ul><li><b>Begin at straight of length</b>: Length of what is considered a straight success. At this length, ease rewards will be applied. The value is the same as deactivating Straight Rewards. (default: 0)</li><li><b>Base ease reward</b>: One of the two values for calculating the ease reward. (default: 15)</li><li><b>Step ease reward</b>: One of the two values for calculating the ease reward. (default: 5)</li><li><b>Start at ease</b>: Only cards with an ease factor between (inclusive) "Start Ease" and "Stop Ease" are considered for ease rewards. (default: 130)</li><li><b>Stop at ease</b>: Only cards with an ease factor between (inclusive) "Start Ease" and "Stop Ease" are considered for ease rewards. (default: 250)</li></ul>
 <b>Calculating Ease Rewards</b>
 
 Formula for calculating the Ease Reward:
-
 <code>
 base_reward + step_reward ⋅ (strait_length - required_straight_length)
 </code>
-
 An Example:
-
-<ol>
-  <li>You rated a card "Good" for the sixth time in a row.</li>
-  <li>The card currently has an ease factor of 250%.</li>
-  <li>You have a straigth length of 4</li>
-  <li>You have a base reward of 15%</li>
-  <li>You have a step reward of 5%</li>
-  <li>You have a start ease of 130%</li>
-  <li>You have a stop ease of 270%</li>
-</ol>
-
+<ol><li>You rated a card "Good" for the sixth time in a row.</li><li>The card currently has an ease factor of 250%.</li><li>You have a straigth length of 4</li><li>You have a base reward of 15%</li><li>You have a step reward of 5%</li><li>You have a start ease of 130%</li><li>You have a stop ease of 270%</li></ol>
 So in this case we have a straight success (because 6 ≥ 4).
 The formula yields: <code>15% + 5% ⋅ (6 - 4) = 15% + 10% = 25%</code>
 So the answer is final ease is <code>250% + 25% = 275%</code>. But Wait!
 <code>275%</code> is more than the stop ease of +270%+: So the ease will be set to the maximum ease of <code>270%</code>.
-
 
 <b>Detecting Straight Successes</b>
 
@@ -53,11 +33,11 @@ The addon knows two mechanisms to detect cards which apply for an ease reward:
 The review hook increases the ease of cards during the review.
 You will get a notification whenever a success straight is detected:
 
-<img src="https://raw.githubusercontent.com/hgiesel/anki_straight_reward/master/images/award_notification.png">Award notification</img>
+<img src="https://raw.githubusercontent.com/hgiesel/anki_straight_reward/master/images/award_notification.png"></img>
 
 The Review hook respects the "Undo" feature:
 
-<img src="https://raw.githubusercontent.com/hgiesel/anki_straight_reward/master/images/reversal_notification.png">Reversal notification</img>
+<img src="https://raw.githubusercontent.com/hgiesel/anki_straight_reward/master/images/reversal_notification.png"></img>
 
 <b>The Sync Hook</b>
 
@@ -69,31 +49,20 @@ Every card is only considered once for an ease reward.
 Two example scenarios:
 
 If you're on a mobile platform, and...
-
-<ol>
-  <li>you rate a card "Good", and then a few days later...</li>
-  <li>you sync it "Hard", and then another few days later...</li>
-  <li>you sync to Anki Desktop, <b>no ease reward</b> can be applied for the first "Good" rating.</li>
-</ol>
+<ol><li>you rate a card "Good", and then a few days later...</li><li>you sync it "Hard", and then another few days later...</li><li>you sync to Anki Desktop, <b>no ease reward</b> can be applied for the first "Good" rating.</li></ol>
 
 If you're on a mobile platform, and...
-
-<ol>
-  <li>you rate a card "Good", and then a few days later...</li>
-  <li>you sync it "Good", and then another few days later...</li>
-  <li>you sync to Anki Desktop, <b>only one ease reward</b> might be applied for the second "Good" rating; the first one will be ignored.</li>
-</ol>
-
+<ol><li>you rate a card "Good", and then a few days later...</li><li>you sync it "Good", and then another few days later...</li><li>you sync to Anki Desktop, <b>only one ease reward</b> might be applied for the second "Good" rating; the first one will be ignored.</li></ol>
 Both of these problems can be avoided, if you just sync back to Desktop often enough.
 I think once a week would already enough to encounter neither of these issues.
 
 All ease changes applied through the sync hook are logged in the addon folder under `user_files/sync_log`.
 
-Based on the <a href="https://github.com/luminousspice/anki-addons/tree/master/Straight_Reward">add-on of the same name</a> by <a src="https://github.com/luminousspice">luminousspice</a>.
-
 If you have any issues, or question, consider <a href="https://github.com/hgiesel/anki-straight_reward" rel="nofollow">writing an issue on GitHub</a>, <a href="https://www.reddit.com/user/hgiesel" rel="nofollow">contacting me on Reddit</a>, or <a href="mailto:hengiesel@gmail.com">writing me a plain old email</a>.
 
 If you like <b>Straight Rewards</b>, don't forget to leave a thumbs up! If you like to support my work, you can <a href="https://ko-fi.com/hgiesel" rel="nofollow">buy me a coffee</a>.
+
+Based on the <a href="https://github.com/luminousspice/anki-addons/tree/master/Straight_Reward">add-on of the same name</a> by <a src="https://github.com/luminousspice">luminousspice</a>.
 
 Updates:
 * 2020-03-05: <a href="https://github.com/hgiesel/anki_set_randomizer/releases/tag/v0.1.0" rel="nofollow">v0.1.0</a>.
