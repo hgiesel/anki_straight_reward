@@ -1,7 +1,5 @@
 declare DIR=${BASH_SOURCE%/*}
 
-npm run --prefix "${DIR}/js" build
-
 if [[ "$1" == '-a' ]]; then
   # for uploading to AnkiWeb
   declare addon_id='??'
