@@ -23,6 +23,13 @@ def log_sync(crt, logs):
         f.write(f"### Ease Changes applied in collection {crt} on {datetime.now()}:\n")
         f.write('\n'.join(logs) + '\n')
 
+def log_problem(crt, log):
+    sync_log = Path(base_path) / Path('sync_log')
+
+    with sync_log.open('at') as f:
+        f.write(f"### Problem while syncing ease changes in collection {crt} on {datetime.now()}:\n")
+        f.write(log + '\n')
+
 cardids_for_straight_check = set()
 
 def check_mobile(self, logs):
@@ -66,14 +73,20 @@ def check_cid(col, cid):
 def check_cardids_for_straights(self, _chunk):
     global cardids_for_straight_check
 
-    logs = [log for log in [
-        check_cid(self.col, cid)
-        for cid
-        in cardids_for_straight_check
-    ] if log is not None]
+    try:
+        logs = [log for log in [
+            check_cid(self.col, cid)
+            for cid
+            in cardids_for_straight_check
+        ] if log is not None]
 
-    log_sync(self.col.crt, logs)
-    cardids_for_straight_check.clear()
+        log_sync(self.col.crt, logs)
+
+    except Exception as e:
+        log_problem(self.col.crt, str(e))
+
+    finally:
+        cardids_for_straight_check.clear()
 
 def init_sync_hook():
     Syncer.mergeRevlog = wrap(Syncer.mergeRevlog, check_mobile, pos='before')
