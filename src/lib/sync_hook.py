@@ -70,7 +70,8 @@ def check_cid(col, cid):
     if easeplus:
         return ': '.join([str(cid), conf['name'], str(easeplus)])
 
-def check_cardids_for_straights(self, _chunk):
+
+def check_cardids_for_straights(self):
     global cardids_for_straight_check
 
     try:
@@ -88,6 +89,17 @@ def check_cardids_for_straights(self, _chunk):
     finally:
         cardids_for_straight_check.clear()
 
+# Unused for now; use when there's a way to get the collection from a new-style hook, see:
+# https://anki.tenderapp.com/discussions/add-ons/42645-getting-collection-during-new-style-sync-hook?unresolve=true
+# def sync_stage_change(stage):
+#     if stage == 'finalize':
+#         check_cardids_for_straights()
+
+def finish_wrapper(self, mod: int):
+    check_cardids_for_straights(self)
+
 def init_sync_hook():
     Syncer.mergeRevlog = wrap(Syncer.mergeRevlog, check_mobile, pos='before')
-    Syncer.applyChunk = wrap(Syncer.applyChunk, check_cardids_for_straights, pos='after')
+    # Ideally this would use hooks.sync_stage_did_change.append(sync_stage_change)
+    # However, there's no way to get the collection in this case, so use a monkey patch for the self.col that Syncer has
+    Syncer.finish = wrap(Syncer.finish, finish_wrapper, pos='after')
