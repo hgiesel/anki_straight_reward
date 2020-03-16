@@ -44,8 +44,6 @@ def check_mobile(self, logs):
 
     newlogs = self.col.db.execute('SELECT * FROM temp.comparelog EXCEPT SELECT * FROM revlog')
 
-    revset = set()
-
     global cardids_for_straight_check
 
     for mobile_rev in newlogs.fetchall():
