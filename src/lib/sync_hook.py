@@ -54,21 +54,21 @@ def check_mobile(self, logs):
 def check_cid(col, cid):
     did = col.decks.for_card_ids([cid])
 
-    # some cards will do not have decks associated with them
-    if did:
-        conf = col.decks.confForDid(did[0])
+    # some cards will do not have decks associated with them,
+    # and in this case we don't know what reward parameters to use, so ignore
+    if not did: return None
 
-        sett = get_setting(col, conf['name'])
-        straightlen = get_straight_len(col, cid)
-        card = Card(col, cid)
+    conf = col.decks.confForDid(did[0])
 
-        easeplus = maybe_apply_reward(sett, straightlen, card)
+    sett = get_setting(col, conf['name'])
+    straightlen = get_straight_len(col, cid)
+    card = Card(col, cid)
 
-        # logging for debug purposes
-        if easeplus:
-            return ': '.join([str(cid), conf['name'], str(easeplus)])
+    easeplus = maybe_apply_reward(sett, straightlen, card)
 
-    return None
+    # logging for debug purposes
+    if easeplus:
+        return ': '.join([str(cid), conf['name'], str(easeplus)])
 
 def check_cardids_for_straights(self, _chunk):
     global cardids_for_straight_check
