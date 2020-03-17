@@ -41,7 +41,6 @@ def get_straight_len(col, card_id: int):
 
     return straight_len(eases.fetchall())
 
-
 def force_ease_change(card, offset: int):
     card.factor += offset
     card.flushSched()
@@ -70,7 +69,8 @@ def apply_ease_change(card, reward: int, sett_min: int, sett_max: int):
         force_ease_change(card, newfactor_offset)
         return int(newfactor_offset / 10)
 
-    return 0
+    else:
+        return 0
 
 def maybe_apply_reward(sett, straightlen, card) -> Optional[Tuple[int, int]]:
     if (
