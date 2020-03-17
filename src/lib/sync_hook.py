@@ -32,7 +32,7 @@ def log_problem(crt, log):
 
 cardids_for_straight_check = set()
 
-def check_mobile(self, logs):
+def check_mobile(self, logs) -> None:
     self.col.db.execute(
         'CREATE TEMP TABLE IF NOT EXISTS comparelog AS SELECT * FROM revlog WHERE 0',
     )
@@ -66,8 +66,11 @@ def check_cid(col, cid):
     easeplus = maybe_apply_reward(sett, straightlen, card)
 
     # logging for debug purposes
-    if easeplus:
-        return ': '.join([str(cid), conf['name'], str(easeplus)])
+    return (
+        ': '.join([str(cid), conf['name'], str(easeplus)])
+        if easeplus
+        else None
+    )
 
 def check_cardids_for_straights(self):
     global cardids_for_straight_check
