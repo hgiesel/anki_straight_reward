@@ -54,7 +54,8 @@ def check_cid(col, cid):
 
     # some cards will do not have decks associated with them,
     # and in this case we don't know what reward parameters to use, so ignore
-    if not did: return None
+    if not did:
+        return None
 
     conf = col.decks.confForDid(did[0])
 
@@ -67,7 +68,6 @@ def check_cid(col, cid):
     # logging for debug purposes
     if easeplus:
         return ': '.join([str(cid), conf['name'], str(easeplus)])
-
 
 def check_cardids_for_straights(self):
     global cardids_for_straight_check
