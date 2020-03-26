@@ -46,8 +46,8 @@ def check_cids(col, newrev_cids) -> List[Tuple[int, int]]:
     for cid in newrev_cids:
         did = col.decks.for_card_ids([cid])
 
-        # some cards will do not have decks associated with them,
-        # and in this case we don't know what reward parameters to use, so ignore
+        # some cards do not have decks associated with them,
+        # and in this case we don't know which straight settings to use, so ignore
         if not did:
             break
 
@@ -85,11 +85,11 @@ def sync_hook_closure():
 
         result = check_cids(col, newrev_cids)
 
-        filtered = [f"cid:{r[0]} easeplus:{r[1]}" for r in result if r[1] != 0]
-        filtered_length = len(filtered)
+        filtered_logs = [f"cid:{r[0]} easeplus:{r[1]}" for r in result if r[1] != 0]
+        filtered_length = len(filtered_logs)
 
         if filtered_length > 0:
-            log_sync(col.crt, filtered)
+            log_sync(col.crt, filtered_logs)
             display_sync_info(filtered_length)
 
         oldids.clear()
