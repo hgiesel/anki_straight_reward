@@ -39,7 +39,7 @@ def get_straight_len(col, card_id: int):
         card_id,
     )
 
-    return straight_len(eases.fetchall())
+    return straight_len(eases)
 
 def force_ease_change(card, offset: int):
     card.factor += offset
