@@ -5,7 +5,7 @@ from sys import maxsize
 from itertools import takewhile
 from typing import List, Tuple, Optional
 
-version = 'v0.2.2'
+version = 'v0.3.0'
 
 class Answer(IntEnum):
     AGAIN = 1
