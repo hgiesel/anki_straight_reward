@@ -31,7 +31,7 @@ def check_for_straight_reward(_reviewer, card, answer: Answer):
 
     easeplus = maybe_apply_reward(sett, straightlen, card)
 
-    if easeplus:
+    if easeplus > 0:
         latest_info[card.id] = easeplus
 
         if sett.enable_notifications:

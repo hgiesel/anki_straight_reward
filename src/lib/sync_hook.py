@@ -85,7 +85,7 @@ def sync_hook_closure():
 
         result = check_cids(col, newrev_cids)
 
-        filtered_logs = [f"cid:{r[0]} easeplus:{r[1]}" for r in result if r[1] != 0]
+        filtered_logs = [f"cid:{r[0]} easeplus:{r[1]}" for r in result if r[1] > 0]
         filtered_length = len(filtered_logs)
 
         if filtered_length > 0:

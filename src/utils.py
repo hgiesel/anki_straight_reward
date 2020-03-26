@@ -72,7 +72,7 @@ def apply_ease_change(card, reward: int, sett_min: int, sett_max: int):
     else:
         return 0
 
-def maybe_apply_reward(sett, straightlen, card) -> Optional[Tuple[int, int]]:
+def maybe_apply_reward(sett, straightlen, card) -> int:
     if (
         sett.straight_length >= 1 and
         straightlen >= sett.straight_length
@@ -87,4 +87,4 @@ def maybe_apply_reward(sett, straightlen, card) -> Optional[Tuple[int, int]]:
         # easeplus of 0 will react similiar to None
         return easeplus
 
-    return None
+    return 0
