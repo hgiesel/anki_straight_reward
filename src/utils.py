@@ -3,29 +3,36 @@ from PyQt5 import QtWidgets, Qt
 from enum import IntEnum
 from sys import maxsize
 from itertools import takewhile
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Literal
 
-version = 'v0.3.0'
+from anki.consts import (
+    BUTTON_ONE, BUTTON_TWO, BUTTON_THREE, BUTTON_FOUR,
+    REVLOG_LRN, REVLOG_REV, REVLOG_RELRN, REVLOG_CRAM,
+)
 
-class Answer(IntEnum):
-    AGAIN = 1
-    HARD = 2
-    GOOD = 3
-    EASY = 4
+Button = Literal[
+    BUTTON_ONE, # Again
+    BUTTON_TWO, # Hard
+    BUTTON_THREE, # Good
+    BUTTON_FOUR, # Easy
+]
 
-class RevlogType(IntEnum):
-    LRN = 0
-    REV = 1
-    RELRN = 2
-    EARLYREV = 3
+RevlogType = Literal[
+    REVLOG_LRN,
+    REVLOG_REV,
+    REVLOG_RELRN,
+    REVLOG_CRAM,
+]
 
-def review_success(v: Tuple[RevlogType, Answer]) -> bool:
+version = 'v0.3.1'
+
+def review_success(v: Tuple[RevlogType, Button]) -> bool:
     return (
-        v[0] in [RevlogType.REV, RevlogType.EARLYREV] and
-        v[1] in [Answer.GOOD, Answer.EASY]
+        v[0] in [REVLOG_REV, REVLOG_CRAM] and
+        v[1] in [BUTTON_THREE, BUTTON_FOUR]
     )
 
-def straight_len(lst: List[Tuple[RevlogType, Answer]]) -> int:
+def straight_len(lst: List[Tuple[RevlogType, Button]]) -> int:
     straight = takewhile(review_success, lst)
     straight_length = len(list(straight))
 

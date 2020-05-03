@@ -4,7 +4,7 @@ from anki.cards import Card
 
 from .config import get_setting
 
-from ..utils import Answer, get_straight_len, maybe_apply_reward, force_ease_change
+from ..utils import Button, get_straight_len, maybe_apply_reward, force_ease_change
 
 def display_success(straightlen: int, easeplus: int):
     MSG = (
@@ -23,7 +23,7 @@ def display_reversal(easeplus):
 
 latest_info = {}
 
-def check_for_straight_reward(_reviewer, card, answer: Answer):
+def check_for_straight_reward(_reviewer, card, answer: Button):
     straightlen = get_straight_len(mw.col, card.id)
 
     conf = mw.col.decks.confForDid(card.did)
