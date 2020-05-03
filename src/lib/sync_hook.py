@@ -49,7 +49,7 @@ def check_cids(col, newrev_cids) -> List[Tuple[int, int]]:
         # some cards do not have decks associated with them,
         # and in this case we don't know which straight settings to use, so ignore
         if not did:
-            break
+            continue
 
         conf = col.decks.confForDid(did[0])
 
