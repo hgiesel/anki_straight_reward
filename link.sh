@@ -1,31 +1,38 @@
 #!/usr/bin/env bash
 declare DIR=$(realpath ${BASH_SOURCE%/*})
+declare addon_name="StraightRewardDev"
 declare customdir=''
 
 if [[ "$1" =~ ^d ]]; then
   if [[ "$customdir" ]]; then
-    rm "${customdir}/StraightRewardDev"
+    rm "$customdir/$name"
+
+  elif [[ -d "$HOME/.local/share/AnkiDev/addons21" ]]; then
+    rm "$HOME/.local/share/AnkiDev/addons21/$addon_name"
 
   elif [[ $(uname) = 'Darwin' ]]; then
-    rm ~/Library/Application\ Support/Anki2/addons21/StraightRewardDev
+    rm "$HOME/Library/Application Support/Anki2/addons21/$addon_name"
 
   elif [[ $(uname) = 'Linux' ]]; then
-    rm ~/.local/share/Anki2/addons21/StraightRewardDev
+    rm "$HOME/.local/share/Anki2/addons21/$addon_name"
 
   else
     echo 'Unknown platform'
     exit -1
   fi
 
-else
-  if [[ $customdir ]]; then
-    ln -s "${DIR}" "${customdir}/StraightRewardDev"
+elif [[ "$1" =~ ^c ]]; then
+  if [[ "$customdir" ]]; then
+    ln -s "$DIR" "$customdir/$addon_name"
+
+  elif [[ -d "$HOME/.local/share/AnkiDev/addons21" ]]; then
+    ln -s "$DIR" "$HOME/.local/share/AnkiDev/addons21/$addon_name"
 
   elif [[ $(uname) = 'Darwin' ]]; then
-    ln -s "${DIR}" ~/Library/Application\ Support/Anki2/addons21/StraightRewardDev
+    ln -s "$DIR" "$HOME/Library/Application\ Support/Anki2/addons21/$addon_name"
 
   elif [[ $(uname) = 'Linux' ]]; then
-    ln -s "${DIR}" ~/.local/share/Anki2/addons21/StraightRewardDev
+    ln -s "$DIR" "$HOME/.local/share/Anki2/addons21/$addon_name"
 
   else
     echo 'Unknown platform'
