@@ -42,18 +42,18 @@ def check_for_straight_reward(_reviewer, card, answer: Button):
 
 def reverse_strait_reward(cardid: int):
     global latest_info
-    card = Card(mw.col, cardid)
-
-    conf = mw.col.decks.confForDid(card.did)
-    sett = get_setting(mw.col, conf['name'])
 
     if cardid in latest_info:
+        del latest_info[cardid]
+
+        card = Card(mw.col, cardid)
+        conf = mw.col.decks.confForDid(card.did)
+        sett = get_setting(mw.col, conf['name'])
+
         force_ease_change(card, -latest_info[cardid] * 10)
 
         if sett.enable_notifications:
             display_reversal(latest_info[cardid])
-
-        del latest_info[cardid]
 
 def init_review_hook():
     gui_hooks.reviewer_did_answer_card.append(check_for_straight_reward)
