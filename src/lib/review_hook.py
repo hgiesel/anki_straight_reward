@@ -8,7 +8,10 @@ from anki.cards import Card
 
 from .config import get_setting
 
-from ..utils import Button, get_straight_len, get_ease_change
+from ..utils import (
+    BUTTON_THREE, BUTTON_FOUR,
+    get_straight_len, get_ease_change,
+)
 
 def display_success(straightlen: int, easeplus: int):
     MSG = (
@@ -24,7 +27,11 @@ def review_hook_closure():
     def check_straight_reward(ease_tuple: Tuple[bool, int], _reviewer, card) -> Tuple[bool, int]:
         nonlocal gains
 
-        straightlen = get_straight_len(mw.col, card.id)
+        if ease_tuple[1] not in [BUTTON_THREE, BUTTON_FOUR]:
+            return ease_tuple
+
+        # plus One for the current success
+        straightlen = get_straight_len(mw.col, card.id) + 1
 
         # check whether it is a filtered deck ("dynamic") which does not reschedule
         if mw.col.decks.isDyn(card.did) and not mw.col.decks.get(card.did)['resched']:
