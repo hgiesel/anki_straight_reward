@@ -2,16 +2,14 @@ from typing import Tuple
 
 from aqt import mw, gui_hooks
 from anki import hooks
+from anki.consts import BUTTON_THREE, BUTTON_FOUR
 
 from aqt.utils import tooltip
 from anki.cards import Card
 
 from .config import get_setting
 
-from ..utils import (
-    BUTTON_THREE, BUTTON_FOUR,
-    get_straight_len, get_ease_change,
-)
+from ..utils import get_straight_len, get_ease_change
 
 def display_success(straightlen: int, easeplus: int):
     MSG = (
