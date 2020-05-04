@@ -102,7 +102,6 @@ def sync_hook_closure():
             log_sync(col.crt, filtered_logs)
             display_sync_info(filtered_length)
 
-
     return {
         'create_comparelog': create_comparelog,
         'after_sync': after_sync,
