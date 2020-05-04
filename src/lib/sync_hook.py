@@ -40,7 +40,8 @@ def check_cid(col, sett, cid) -> int:
     card.factor += easeplus
     card.flush()
 
-    return easeplus
+    # short factor
+    return int(easeplus / 10)
 
 def check_cids(col, reviewed_cids: List[int]) -> List[Tuple[int, int]]:
     result = []
@@ -49,14 +50,15 @@ def check_cids(col, reviewed_cids: List[int]) -> List[Tuple[int, int]]:
     for revcid in reviewed_cids:
         # rev did not change interval a bit:
         # must be a filtered deck with rescheduling off
-        did = col.decks.for_card_ids([revcid])
+        card = Card(col, revcid)
+        did = card.odid or card.did
 
         # some cards do not have decks associated with them,
         # and in this case we don't know which straight settings to use, so ignore
         if not did:
             continue
 
-        conf = col.decks.confForDid(did[0])
+        conf = col.decks.confForDid(did)
 
         if conf['name'] in cached_setts:
             sett = cached_setts[conf['name']]
@@ -64,7 +66,7 @@ def check_cids(col, reviewed_cids: List[int]) -> List[Tuple[int, int]]:
             sett = get_setting(col, conf['name'])
             cached_setts[conf['name']] = sett
 
-            result.append((revcid, check_cid(col, sett, revcid)))
+        result.append((revcid, check_cid(col, sett, revcid)))
 
     return result
 
@@ -77,7 +79,7 @@ def sync_hook_closure():
 
         # flatten ids
         nonlocal oldids
-        oldids = [id for sublist in col.db.execute('SELECT id, ivl, lastIvl FROM revlog') for id in sublist]
+        oldids = [id for sublist in col.db.execute('SELECT id FROM revlog') for id in sublist]
 
     def after_sync(col) -> None:
         nonlocal oldids
@@ -88,7 +90,8 @@ def sync_hook_closure():
         oldidstring = ','.join([str(oldid) for oldid in oldids])
         oldids.clear()
 
-        reviewed_cids = [item for sublist in col.db.execute(f'SELECT DISTINCT cid FROM revlog WHERE id NOT IN ({oldidstring}) and ivl != lastIvl') for item in sublist]
+        # exclude entries where ivl == lastIvl: they indicate a dynamic deck without rescheduling
+        reviewed_cids = [id for sublist in col.db.execute(f'SELECT DISTINCT cid FROM revlog WHERE id NOT IN ({oldidstring}) and ivl != lastIvl') for id in sublist]
 
         result = check_cids(col, reviewed_cids)
 

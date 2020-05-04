@@ -1,10 +1,11 @@
 from typing import Tuple
 
-from aqt import mw, gui_hooks
-from anki import hooks
-from anki.consts import BUTTON_THREE, BUTTON_FOUR
-
+from aqt import mw
+from aqt.gui_hooks import reviewer_will_answer_card
 from aqt.utils import tooltip
+
+from anki.hooks import card_will_flush
+from anki.consts import BUTTON_THREE, BUTTON_FOUR
 from anki.cards import Card
 
 from .config import get_setting
@@ -67,5 +68,5 @@ def review_hook_closure():
 def init_review_hook():
     review_hook = review_hook_closure()
 
-    gui_hooks.reviewer_will_answer_card.append(review_hook['check'])
-    hooks.card_will_flush.append(review_hook['flush'])
+    reviewer_will_answer_card.append(review_hook['check'])
+    card_will_flush.append(review_hook['flush'])
