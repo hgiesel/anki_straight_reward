@@ -1,10 +1,14 @@
+from typing import Tuple
+
 from aqt import mw, gui_hooks
+from anki import hooks
+
 from aqt.utils import tooltip
 from anki.cards import Card
 
 from .config import get_setting
 
-from ..utils import Button, get_straight_len, maybe_apply_reward, force_ease_change
+from ..utils import Button, get_straight_len, get_ease_change
 
 def display_success(straightlen: int, easeplus: int):
     MSG = (
@@ -14,47 +18,49 @@ def display_success(straightlen: int, easeplus: int):
 
     tooltip(MSG)
 
-def display_reversal(easeplus):
-    MSG = (
-        f"Reversed previous Ease Increase of {easeplus}."
-    )
+def review_hook_closure():
+    gains = {}
 
-    tooltip(MSG)
+    def check_straight_reward(ease_tuple: Tuple[bool, int], _reviewer, card) -> Tuple[bool, int]:
+        nonlocal gains
 
-latest_info = {}
+        straightlen = get_straight_len(mw.col, card.id)
 
-def check_for_straight_reward(_reviewer, card, answer: Button):
-    straightlen = get_straight_len(mw.col, card.id)
+        # check whether it is a filtered deck ("dynamic") which does not reschedule
+        if mw.col.decks.isDyn(card.did) and not mw.col.decks.get(card.did)['resched']:
+            return ease_tuple
 
-    conf = mw.col.decks.confForDid(card.did)
-    sett = get_setting(mw.col, conf['name'])
-
-    easeplus = maybe_apply_reward(sett, straightlen, card)
-
-    if easeplus > 0:
-        latest_info[card.id] = easeplus
-
-        if sett.enable_notifications:
-            display_success(straightlen, easeplus)
-
-    elif card.id in latest_info:
-        del latest_info[card.id]
-
-def reverse_strait_reward(cardid: int):
-    global latest_info
-
-    if cardid in latest_info:
-        del latest_info[cardid]
-
-        card = Card(mw.col, cardid)
-        conf = mw.col.decks.confForDid(card.did)
+        conf = mw.col.decks.confForDid(card.odid or card.did)
         sett = get_setting(mw.col, conf['name'])
 
-        force_ease_change(card, -latest_info[cardid] * 10)
+        easeplus = get_ease_change(sett, straightlen, card)
+
+        if not easeplus:
+            return ease_tuple
+
+        gains[card.id] = easeplus
 
         if sett.enable_notifications:
-            display_reversal(latest_info[cardid])
+            display_success(straightlen, int(easeplus / 10))
+
+        return ease_tuple
+
+    def flush_with_straight_reward(card):
+        nonlocal gains
+
+        if card.id not in gains:
+            return
+
+        card.factor += gains[card.id]
+        del gains[card.id]
+
+    return {
+        'check': check_straight_reward,
+        'flush': flush_with_straight_reward,
+    }
 
 def init_review_hook():
-    gui_hooks.reviewer_did_answer_card.append(check_for_straight_reward)
-    gui_hooks.review_did_undo.append(reverse_strait_reward)
+    review_hook = review_hook_closure()
+
+    gui_hooks.reviewer_will_answer_card.append(review_hook['check'])
+    hooks.card_will_flush.append(review_hook['flush'])

@@ -12,7 +12,7 @@ from aqt.gui_hooks import collection_did_load
 from aqt.utils import tooltip
 
 from .config import get_setting
-from ..utils import get_straight_len, maybe_apply_reward
+from ..utils import get_straight_len, get_ease_change
 
 base_path = mw.addonManager._userFilesPath(__name__.split('.')[0])
 
@@ -36,15 +36,20 @@ def check_cid(col, sett, cid) -> int:
     straightlen = get_straight_len(col, cid)
     card = Card(col, cid)
 
-    easeplus = maybe_apply_reward(sett, straightlen, card)
+    easeplus = get_ease_change(sett, straightlen, card)
+    card.factor += easeplus
+    card.flush()
+
     return easeplus
 
-def check_cids(col, newrev_cids) -> List[Tuple[int, int]]:
+def check_cids(col, reviewed_cids: List[int]) -> List[Tuple[int, int]]:
     result = []
     cached_setts = {}
 
-    for cid in newrev_cids:
-        did = col.decks.for_card_ids([cid])
+    for revcid in reviewed_cids:
+        # rev did not change interval a bit:
+        # must be a filtered deck with rescheduling off
+        did = col.decks.for_card_ids([revcid])
 
         # some cards do not have decks associated with them,
         # and in this case we don't know which straight settings to use, so ignore
@@ -59,7 +64,7 @@ def check_cids(col, newrev_cids) -> List[Tuple[int, int]]:
             sett = get_setting(col, conf['name'])
             cached_setts[conf['name']] = sett
 
-        result.append((cid, check_cid(col, sett, cid)))
+            result.append((revcid, check_cid(col, sett, revcid)))
 
     return result
 
@@ -72,7 +77,7 @@ def sync_hook_closure():
 
         # flatten ids
         nonlocal oldids
-        oldids = [id for sublist in col.db.execute('SELECT id FROM revlog') for id in sublist]
+        oldids = [id for sublist in col.db.execute('SELECT id, ivl, lastIvl FROM revlog') for id in sublist]
 
     def after_sync(col) -> None:
         nonlocal oldids
@@ -81,9 +86,11 @@ def sync_hook_closure():
             return
 
         oldidstring = ','.join([str(oldid) for oldid in oldids])
-        newrev_cids = [nl for sublist in col.db.execute(f'SELECT DISTINCT cid FROM revlog WHERE id NOT IN ({oldidstring})') for nl in sublist]
+        oldids.clear()
 
-        result = check_cids(col, newrev_cids)
+        reviewed_cids = [item for sublist in col.db.execute(f'SELECT DISTINCT cid FROM revlog WHERE id NOT IN ({oldidstring}) and ivl != lastIvl') for item in sublist]
+
+        result = check_cids(col, reviewed_cids)
 
         filtered_logs = [f"cid:{r[0]} easeplus:{r[1]}" for r in result if r[1] > 0]
         filtered_length = len(filtered_logs)
@@ -92,7 +99,6 @@ def sync_hook_closure():
             log_sync(col.crt, filtered_logs)
             display_sync_info(filtered_length)
 
-        oldids.clear()
 
     return {
         'create_comparelog': create_comparelog,
@@ -100,7 +106,7 @@ def sync_hook_closure():
     }
 
 def init_sync_hook():
-    sh = sync_hook_closure()
+    sync_hook = sync_hook_closure()
 
-    AnkiQt._sync = wrap(AnkiQt._sync, sh['create_comparelog'], pos='before')
-    collection_did_load.append(sh['after_sync'])
+    AnkiQt._sync = wrap(AnkiQt._sync, sync_hook['create_comparelog'], pos='before')
+    collection_did_load.append(sync_hook['after_sync'])

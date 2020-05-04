@@ -42,23 +42,20 @@ def get_straight_len(col, card_id: int):
     """Returns the length of the current straight from revlog"""
 
     eases = col.db.execute(
-        "SELECT type, ease FROM revlog WHERE cid = ? ORDER BY id DESC",
+        "SELECT type, ease FROM revlog WHERE cid = ? AND ivl != lastIvl ORDER BY id DESC",
         card_id,
     )
 
     return straight_len(eases)
 
-def force_ease_change(card, offset: int):
-    card.factor += offset
-    card.flushSched()
-
-def apply_ease_change(card, reward: int, sett_min: int, sett_max: int):
+def calculate_ease_change(card, reward: int, sett_min: int, sett_max: int):
     """Increase ease factor as reward for straight"""
     BARE_MINIMUM = 1300
     ABSOLUTE_MAXIMUM = 9990
 
     personal_maximum = sett_max * 10
     personal_minimum = sett_min * 10
+    the_reward = reward * 10
 
     oldfactor = card.factor
 
@@ -69,29 +66,27 @@ def apply_ease_change(card, reward: int, sett_min: int, sett_max: int):
             max(
                 BARE_MINIMUM,
                 personal_minimum,
-                card.factor + reward * 10
+                card.factor + the_reward,
             )
         ) - oldfactor
 
-        force_ease_change(card, newfactor_offset)
-        return int(newfactor_offset / 10)
+        return int(newfactor_offset)
 
     else:
         return 0
 
-def maybe_apply_reward(sett, straightlen, card) -> int:
+# returns 250, NOT 2500
+def get_ease_change(sett, straightlen, card) -> int:
     if (
         sett.straight_length >= 1 and
         straightlen >= sett.straight_length
     ):
-        easeplus = apply_ease_change(
+        # easeplus of 0 will be falsy
+        return calculate_ease_change(
             card,
             sett.base_ease + (straightlen - sett.straight_length) * sett.step_ease,
             sett.start_ease,
             sett.stop_ease,
         )
-
-        # easeplus of 0 will react similiar to None
-        return easeplus
 
     return 0
