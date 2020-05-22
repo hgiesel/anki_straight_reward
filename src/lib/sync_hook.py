@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 from pathlib import Path
 from datetime import datetime
 
@@ -32,41 +32,58 @@ def display_sync_info(count: int):
 
     tooltip(MSG)
 
-def check_cid(col, sett, cid) -> int:
-    straightlen = get_straight_len(col, cid)
-    card = Card(col, cid)
-
+def check_cid(col, sett, card: Card, skip) -> int:
+    straightlen = get_straight_len(col, card.id, skip)
     easeplus = get_ease_change(sett, straightlen, card)
+
     card.factor += easeplus
     card.flush()
 
     # short factor
     return int(easeplus / 10)
 
+def make_cid_counter(reviewed_cids: List[int]) -> Dict[int, int]:
+    cid_counter = {}
+
+    for cid in reviewed_cids:
+        if cid in cid_counter:
+            cid_counter[cid] += 1
+        else:
+            cid_counter[cid] = 0
+
+    return cid_counter
+
 def check_cids(col, reviewed_cids: List[int]) -> List[Tuple[int, int]]:
     result = []
     cached_setts = {}
+    cid_counter = make_cid_counter(reviewed_cids)
 
-    for revcid in reviewed_cids:
-        # rev did not change interval a bit:
-        # must be a filtered deck with rescheduling off
-        card = Card(col, revcid)
-        did = card.odid or card.did
+    for revcid, count in cid_counter.items():
+        # python ending index is always exclusive
+        inclusive_count = count + 1
 
-        # some cards do not have decks associated with them,
-        # and in this case we don't know which straight settings to use, so ignore
-        if not did:
-            continue
+        # if a card was reviewed multiple times
+        # we need to skip the most recent reviews for consideration
+        for skip in range(inclusive_count):
+            card = Card(col, revcid)
+            did = card.odid or card.did
 
-        conf = col.decks.confForDid(did)
+            # some cards do not have decks associated with them,
+            # and in this case we don't know which straight settings to use, so ignore
+            if not did:
+                continue
 
-        if conf['name'] in cached_setts:
-            sett = cached_setts[conf['name']]
-        else:
-            sett = get_setting(col, conf['name'])
-            cached_setts[conf['name']] = sett
+            conf = col.decks.confForDid(did)
 
-        result.append((revcid, check_cid(col, sett, revcid)))
+            if conf['name'] in cached_setts:
+                sett = cached_setts[conf['name']]
+            else:
+                sett = get_setting(col, conf['name'])
+                cached_setts[conf['name']] = sett
+
+            easeplus_shortened = check_cid(col, sett, card, skip)
+
+            result.append((revcid, easeplus_shortened))
 
     return result
 
@@ -91,7 +108,7 @@ def sync_hook_closure():
         oldids.clear()
 
         # exclude entries where ivl == lastIvl: they indicate a dynamic deck without rescheduling
-        reviewed_cids = [id for sublist in col.db.execute(f'SELECT DISTINCT cid FROM revlog WHERE id NOT IN ({oldidstring}) and ivl != lastIvl') for id in sublist]
+        reviewed_cids = [cid for sublist in col.db.execute(f'SELECT cid FROM revlog WHERE id NOT IN ({oldidstring}) and ivl != lastIvl') for cid in sublist]
 
         result = check_cids(col, reviewed_cids)
 

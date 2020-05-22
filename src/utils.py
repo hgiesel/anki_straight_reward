@@ -32,13 +32,13 @@ def review_success(v: Tuple[RevlogType, Button]) -> bool:
         v[1] in [BUTTON_THREE, BUTTON_FOUR]
     )
 
-def straight_len(lst: List[Tuple[RevlogType, Button]]) -> int:
-    straight = takewhile(review_success, lst)
+def straight_len(eases: List[Tuple[RevlogType, Button]]) -> int:
+    straight = takewhile(review_success, eases)
     straight_length = len(list(straight))
 
     return straight_length
 
-def get_straight_len(col, card_id: int):
+def get_straight_len(col, card_id: int, skip: int = 0):
     """Returns the length of the current straight from revlog"""
 
     eases = col.db.execute(
@@ -46,7 +46,7 @@ def get_straight_len(col, card_id: int):
         card_id,
     )
 
-    return straight_len(eases)
+    return straight_len(eases[skip:])
 
 def calculate_ease_change(card, reward: int, sett_min: int, sett_max: int):
     """Increase ease factor as reward for straight"""
