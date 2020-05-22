@@ -1,0 +1,34 @@
+name: Zip Anki add-ons ⭐️
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false 
+
+      - name: Install and Build 🔧
+        run: |
+          ./zip.sh
+          ./zip.sh -a
+
+      - name: Upload personal addon to GitHub
+        uses: actions/upload-artifact@v2
+        with:
+          name: Anki add-on for personal use
+          path: anki/straight_reward.ankiaddon
+
+      - name: Upload Ankiweb addon to GitHub
+        uses: actions/upload-artifact@v2
+        with:
+          name: Anki add-on for Ankiweb
+          path: anki/957961234.ankiaddo
