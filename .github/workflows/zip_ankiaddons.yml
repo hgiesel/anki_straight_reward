@@ -25,10 +25,10 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: Anki add-on for personal use
-          path: anki/straight_reward.ankiaddon
+          path: straight_reward.ankiaddon
 
       - name: Upload Ankiweb addon to GitHub
         uses: actions/upload-artifact@v2
         with:
           name: Anki add-on for Ankiweb
-          path: anki/957961234.ankiaddo
+          path: 957961234.ankiaddon
