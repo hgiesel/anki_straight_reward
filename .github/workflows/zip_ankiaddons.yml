@@ -18,17 +18,17 @@ jobs:
 
       - name: Install and Build 🔧
         run: |
-          ./zip.sh
-          ./zip.sh -a
+          bin/zip.sh
+          bin/zip.sh -a
 
       - name: Upload personal addon to GitHub
         uses: actions/upload-artifact@v2
         with:
           name: Anki add-on for personal use
-          path: straight_reward.ankiaddon
+          path: build/straight_reward.ankiaddon
 
       - name: Upload Ankiweb addon to GitHub
         uses: actions/upload-artifact@v2
         with:
           name: Anki add-on for Ankiweb
-          path: 957961234.ankiaddon
+          path: build/957961234.ankiaddon

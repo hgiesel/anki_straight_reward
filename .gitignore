@@ -13,4 +13,4 @@ tags
 
 # Specific to this repository
 /meta.json
-*.ankiaddon
+/build/*

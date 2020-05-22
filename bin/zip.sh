@@ -1,6 +1,7 @@
-declare DIR=${BASH_SOURCE%/*}
+declare DIR="$(cd "$(dirname "$0")/.." && pwd -P)"
+mkdir -p "$DIR/build"
 
-if [[ "$1" == '-a' ]]; then
+if [[ "$1" =~ ^-?a$ ]]; then
   # for uploading to AnkiWeb
   declare addon_id='957961234'
 else
@@ -8,9 +9,7 @@ else
   declare addon_id='straight_reward'
 fi
 
-rm -f "${DIR}/${addon_id}.ankiaddon"
-
-zip -r "${DIR}/${addon_id}.ankiaddon" \
+zip -r "${DIR}/build/${addon_id}.ankiaddon" \
   "${DIR}/config."{json,md} \
   "${DIR}/manifest.json" \
   "${DIR}/user_files/README.md" \

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-declare DIR=$(realpath ${BASH_SOURCE%/*})
+declare DIR="$(cd "$(dirname "$0")/.." && pwd -P)"
 declare addon_name="StraightRewardDev"
 declare customdir=''
 
-if [[ "$1" =~ ^d || "$1" =~ ^-d ]]; then
+if [[ "$1" =~ ^-?d$ ]]; then
   if [[ -d "$customdir" ]]; then
     rm "$customdir/$addon_name"
 
@@ -21,7 +21,7 @@ if [[ "$1" =~ ^d || "$1" =~ ^-d ]]; then
     exit -1
   fi
 
-elif [[ "$1" =~ ^c || "$1" =~ ^-c ]]; then
+elif [[ "$1" =~ ^-?c$ ]]; then
   if [[ -d "$customdir" ]]; then
     ln -s "$DIR" "$customdir/$addon_name"
 
