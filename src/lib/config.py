@@ -103,8 +103,11 @@ def write_settings(col, settings: List[StraightSetting]) -> None:
         'settings': new_config,
     })
 
-def write_setting(col, setting: StraightSetting) -> None:
+def write_setting(col, setting: StraightSetting, overwrite_name: Optional[str] = None) -> None:
     serialized_setting = serialize_setting(setting)
+
+    if overwrite_name:
+        serialized_setting['deckConfName'] = overwrite_name
 
     all_config = mw.addonManager.getConfig(__name__)
     current_config = safenav(
