@@ -48,18 +48,6 @@ Applies when you do reviews on another platform (e.g. AnkiMobile or AnkiDroid) a
 
 <img src="https://raw.githubusercontent.com/hgiesel/anki_straight_reward/master/images/sync_notification.png"></img>
 
-There are some limits to this approach: Every card is only considered once for an ease reward.
-
-<b>Known issues</b>
-
-If you're on a mobile platform, and...
-<ol><li>you rate a card "Good", and then a few days later...</li><li>you rate it "Hard", and then another few days later...</li><li>you sync to Anki Desktop, <b>no ease reward</b> can be applied for the first "Good" rating.</li></ol>
-
-If you're on a mobile platform, and...
-<ol><li>you rate a card "Good", and then a few days later...</li><li>you rate it "Good", and then another few days later...</li><li>you sync to Anki Desktop, <b>only one ease reward</b> might be applied for the second "Good" rating; the first one will be ignored.</li></ol>
-Both of these problems can be avoided, if you just sync back to Desktop often enough.
-I think once a week would already suffice to encounter neither of these issues.
-
 All ease changes applied through the sync hook are logged in the addon folder under <code>user_files/sync_log</code>.
 
 If you have any problems or questions, consider <a href="https://github.com/hgiesel/anki_straight_reward" rel="nofollow">writing an issue on GitHub</a>, <a href="https://www.reddit.com/user/hgiesel" rel="nofollow">contacting me on Reddit</a>, or <a href="mailto:hengiesel@gmail.com">sending me a plain old email</a>.
