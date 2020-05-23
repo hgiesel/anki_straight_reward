@@ -8,9 +8,7 @@ from anki.hooks import card_will_flush
 from anki.consts import BUTTON_THREE, BUTTON_FOUR
 from anki.cards import Card
 
-from .config import get_setting
-
-from ..utils import get_straight_len, get_ease_change
+from ..utils import get_straight_len, get_easeplus, notifications_enabled
 
 def display_success(straightlen: int, easeplus: int):
     MSG = (
@@ -29,24 +27,20 @@ def review_hook_closure():
         if ease_tuple[1] not in [BUTTON_THREE, BUTTON_FOUR]:
             return ease_tuple
 
-        # plus One for the current success
-        straightlen = get_straight_len(mw.col, card.id) + 1
-
         # check whether it is a filtered deck ("dynamic") which does not reschedule
         if mw.col.decks.isDyn(card.did) and not mw.col.decks.get(card.did)['resched']:
             return ease_tuple
 
-        conf = mw.col.decks.confForDid(card.odid or card.did)
-        sett = get_setting(mw.col, conf['name'])
-
-        easeplus = get_ease_change(sett, straightlen, card)
+        # plus One for the current success
+        straightlen = get_straight_len(mw.col, card.id) + 1
+        easeplus = get_easeplus(card, straightlen)
 
         if not easeplus:
             return ease_tuple
 
         gains[card.id] = easeplus
 
-        if sett.enable_notifications:
+        if notifications_enabled(card):
             display_success(straightlen, int(easeplus / 10))
 
         return ease_tuple

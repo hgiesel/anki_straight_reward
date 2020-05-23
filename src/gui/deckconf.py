@@ -1,37 +1,25 @@
-from PyQt5 import QtWidgets, Qt, QtCore
+from PyQt5 import QtWidgets
 
 from dataclasses import asdict
 
 from aqt import mw
 from aqt.deckconf import DeckConf
-from aqt.gui_hooks import deck_conf_did_load_config, deck_conf_will_save_config, deck_conf_did_setup_ui_form
 
-from anki.hooks import wrap
-
-from ..lib.config_types import StraightSetting
-from ..lib.config import (
-    get_setting, get_default_setting,
-    write_setting,
-    remove_setting, rename_setting,
+from aqt.gui_hooks import (
+    deck_conf_did_load_config,
+    deck_conf_will_save_config,
+    deck_conf_did_setup_ui_form,
 )
 
-def get_straight_setting_from_dconf(dconf, name: str = 'temp') -> StraightSetting:
-    """Save the option for Straight Reward."""
-    f = dconf.form
+from ..config import (
+    KEYWORD,
+    StraightSetting,
+    get_setting,
+    get_setting_from_conf,
+    get_default_setting,
+)
 
-    result = StraightSetting(
-        name,
-        f.straightLengthSpinBox.value(),
-        f.straightEnableNotificationsCheckBox.isChecked(),
-        f.straightBaseEaseSpinBox.value(),
-        f.straightStepEaseSpinBox.value(),
-        f.straightStartEaseSpinBox.value(),
-        f.straightStopEaseSpinBox.value(),
-    )
-
-    return result
-
-def setup_reward_tab(dconf) -> None:
+def setup_reward_tab(dconf: DeckConf) -> None:
     """Add an option tab for Straight Reward at Review section on Deckconf dialog."""
     f = dconf.form
 
@@ -107,9 +95,9 @@ def setup_reward_tab(dconf) -> None:
     f.gridLayout_straight.addItem(verticalSpacer)
 
     w.setLayout(f.gridLayout_straight)
-    f.tabWidget.insertTab(2, w, 'Straight Rewards')
+    f.tabWidget.insertTab(2, w, 'Rewards')
 
-def load_reward_tab_with_setting(dconf, sett: StraightSetting) -> None:
+def load_reward_tab_with_setting(dconf: DeckConf, sett: StraightSetting) -> None:
     f = dconf.form
 
     f.straightLengthSpinBox.setValue(sett.straight_length)
@@ -119,53 +107,31 @@ def load_reward_tab_with_setting(dconf, sett: StraightSetting) -> None:
     f.straightStartEaseSpinBox.setValue(sett.start_ease)
     f.straightStopEaseSpinBox.setValue(sett.stop_ease)
 
-def load_reward_tab(dconf, deck, config) -> None:
+def load_reward_tab(dconf: DeckConf, _deck, config) -> None:
     """Get the option for Straight Reward."""
-    straight_sett = get_setting(mw.col, config['name'])
+    straight_sett = get_setting_from_conf(config)
     load_reward_tab_with_setting(dconf, straight_sett)
 
-def save_reward_tab(dconf, deck, config) -> None:
-    setting = get_straight_setting_from_dconf(dconf, config['name'])
-    write_setting(mw.col, setting)
+def get_setting_from_reward_tab(dconf: DeckConf) -> StraightSetting:
+    """Save the option for Straight Reward."""
+    f = dconf.form
 
-    # save on Anki config object and leave saving to Anki
-    config['straightReward'] = asdict(setting)
+    result = StraightSetting(
+        f.straightLengthSpinBox.value(),
+        f.straightEnableNotificationsCheckBox.isChecked(),
+        f.straightBaseEaseSpinBox.value(),
+        f.straightStepEaseSpinBox.value(),
+        f.straightStartEaseSpinBox.value(),
+        f.straightStopEaseSpinBox.value(),
+    )
 
+    return result
 
-def add_straight_setting(dconf, _old) -> None:
-    save_names = {c['name'] for c in mw.col.decks.allConf()}
-    previous_setting = get_straight_setting_from_dconf(dconf)
-
-    _old(dconf)
-
-    new_names = {c['name'] for c in mw.col.decks.allConf()}
-    the_new_name = new_names.difference(save_names)
-
-    if len(the_new_name) == 1:
-        load_reward_tab_with_setting(dconf, previous_setting)
-
-    # otherwise user reused an old name
-    # this is considered undefined behavior within this add-on
-
-def update_straight_setting(dconf, _old) -> None:
-    save_names = {c['name'] for c in mw.col.decks.allConf()}
-
-    _old(dconf)
-
-    new_names = {c['name'] for c in mw.col.decks.allConf()}
-    name_for_deletion = save_names.difference(new_names)
-
-    if len(name_for_deletion) == 1:
-        remove_setting(mw.col, name_for_deletion.pop())
-
-    # otherwise user renamed conf to old name, or reuses name
-    # reusing a name is considered undefined behavior within this add-on
+def save_reward_tab(dconf: DeckConf, _deck, config) -> None:
+    setting = get_setting_from_reward_tab(dconf)
+    config[KEYWORD] = asdict(setting)
 
 def init_conf():
     deck_conf_did_setup_ui_form.append(setup_reward_tab)
     deck_conf_did_load_config.append(load_reward_tab)
     deck_conf_will_save_config.append(save_reward_tab)
-
-    DeckConf.addGroup = wrap(DeckConf.addGroup, add_straight_setting, 'around')
-    DeckConf.remGroup = wrap(DeckConf.remGroup, update_straight_setting, 'around')
-    DeckConf.renameGroup = wrap(DeckConf.renameGroup, update_straight_setting, 'around')

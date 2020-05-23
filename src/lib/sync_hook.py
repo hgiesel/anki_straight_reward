@@ -3,16 +3,15 @@ from pathlib import Path
 from datetime import datetime
 
 from anki.hooks import wrap
-from anki.cards import Card
 from anki.storage import Collection
+from anki.cards import Card
 
 from aqt import mw
 from aqt.main import AnkiQt
 from aqt.gui_hooks import collection_did_load
 from aqt.utils import tooltip
 
-from .config import get_setting
-from ..utils import get_straight_len, get_ease_change
+from ..utils import get_straight_len, get_easeplus
 
 base_path = mw.addonManager._userFilesPath(__name__.split('.')[0])
 
@@ -32,9 +31,9 @@ def display_sync_info(count: int):
 
     tooltip(MSG)
 
-def check_cid(col, sett, card: Card, skip) -> int:
+def check_cid(col, card: Card, skip) -> int:
     straightlen = get_straight_len(col, card.id, skip)
-    easeplus = get_ease_change(sett, straightlen, card)
+    easeplus = get_easeplus(card, straightlen)
 
     card.factor += easeplus
     card.flush()
@@ -55,7 +54,6 @@ def make_cid_counter(reviewed_cids: List[int]) -> Dict[int, int]:
 
 def check_cids(col, reviewed_cids: List[int]) -> List[Tuple[int, int]]:
     result = []
-    cached_setts = {}
     cid_counter = make_cid_counter(reviewed_cids)
 
     for revcid, count in cid_counter.items():
@@ -66,23 +64,14 @@ def check_cids(col, reviewed_cids: List[int]) -> List[Tuple[int, int]]:
         # we need to skip the most recent reviews for consideration
         for skip in range(inclusive_count):
             card = Card(col, revcid)
-            did = card.odid or card.did
 
             # some cards do not have decks associated with them,
             # and in this case we don't know which straight settings to use, so ignore
+            did = card.odid or card.did
             if not did:
                 continue
 
-            conf = col.decks.confForDid(did)
-
-            if conf['name'] in cached_setts:
-                sett = cached_setts[conf['name']]
-            else:
-                sett = get_setting(col, conf['name'])
-                cached_setts[conf['name']] = sett
-
-            easeplus_shortened = check_cid(col, sett, card, skip)
-
+            easeplus_shortened = check_cid(col, card, skip)
             result.append((revcid, easeplus_shortened))
 
     return result
@@ -119,13 +108,13 @@ def sync_hook_closure():
             log_sync(col.crt, filtered_logs)
             display_sync_info(filtered_length)
 
-    return {
-        'create_comparelog': create_comparelog,
-        'after_sync': after_sync,
-    }
+    return (
+        create_comparelog,
+        after_sync,
+    )
 
 def init_sync_hook():
-    sync_hook = sync_hook_closure()
+    create, after = sync_hook_closure()
 
-    AnkiQt._sync = wrap(AnkiQt._sync, sync_hook['create_comparelog'], pos='before')
-    collection_did_load.append(sync_hook['after_sync'])
+    AnkiQt._sync = wrap(AnkiQt._sync, create, pos='before')
+    collection_did_load.append(after)

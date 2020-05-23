@@ -1,4 +1,6 @@
 from PyQt5 import QtWidgets, Qt
+from aqt import mw
+from anki.cards import Card
 
 from enum import IntEnum
 from sys import maxsize
@@ -24,7 +26,7 @@ RevlogType = Literal[
     REVLOG_CRAM,
 ]
 
-version = 'v0.3.1'
+version = 'v0.4.0'
 
 def review_success(v: Tuple[RevlogType, Button]) -> bool:
     return (
@@ -38,17 +40,7 @@ def straight_len(eases: List[Tuple[RevlogType, Button]]) -> int:
 
     return straight_length
 
-def get_straight_len(col, card_id: int, skip: int = 0):
-    """Returns the length of the current straight from revlog"""
-
-    eases = col.db.execute(
-        "SELECT type, ease FROM revlog WHERE cid = ? AND ivl != lastIvl ORDER BY id DESC",
-        card_id,
-    )
-
-    return straight_len(eases[skip:])
-
-def calculate_ease_change(card, reward: int, sett_min: int, sett_max: int):
+def calculate_ease_change(card: Card, reward: int, sett_min: int, sett_max: int):
     """Increase ease factor as reward for straight"""
     BARE_MINIMUM = 1300
     ABSOLUTE_MAXIMUM = 9990
@@ -75,8 +67,12 @@ def calculate_ease_change(card, reward: int, sett_min: int, sett_max: int):
     else:
         return 0
 
+from .config import  get_setting
+
 # returns 250, NOT 2500
-def get_ease_change(sett, straightlen, card) -> int:
+def get_easeplus(card: Card, straightlen: int) -> int:
+    sett = get_setting(card)
+
     if (
         sett.straight_length >= 1 and
         straightlen >= sett.straight_length
@@ -90,3 +86,16 @@ def get_ease_change(sett, straightlen, card) -> int:
         )
 
     return 0
+
+def get_straight_len(col, card_id: int, skip: int = 0) -> int:
+    """Returns the length of the current straight from revlog"""
+
+    eases = col.db.execute(
+        "SELECT type, ease FROM revlog WHERE cid = ? AND ivl != lastIvl ORDER BY id DESC",
+        card_id,
+    )
+
+    return straight_len(eases[skip:])
+
+def notifications_enabled(card: Card) -> bool:
+    return get_setting(card).enable_notifications
