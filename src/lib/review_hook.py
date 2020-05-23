@@ -60,13 +60,13 @@ def review_hook_closure():
         card.factor += gains[card.id]
         del gains[card.id]
 
-    return {
-        'check': check_straight_reward,
-        'flush': flush_with_straight_reward,
-    }
+    return (
+        check_straight_reward,
+        flush_with_straight_reward,
+    )
 
 def init_review_hook():
-    review_hook = review_hook_closure()
+    check, flush = review_hook_closure()
 
-    reviewer_will_answer_card.append(review_hook['check'])
-    card_will_flush.append(review_hook['flush'])
+    reviewer_will_answer_card.append(check)
+    card_will_flush.append(flush)

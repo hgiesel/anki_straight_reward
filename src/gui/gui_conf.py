@@ -1,5 +1,7 @@
 from PyQt5 import QtWidgets, Qt, QtCore
 
+from dataclasses import asdict
+
 from aqt import mw
 from aqt.deckconf import DeckConf
 from aqt.gui_hooks import deck_conf_did_load_config, deck_conf_will_save_config, deck_conf_did_setup_ui_form
@@ -125,6 +127,10 @@ def load_reward_tab(dconf, deck, config) -> None:
 def save_reward_tab(dconf, deck, config) -> None:
     setting = get_straight_setting_from_dconf(dconf, config['name'])
     write_setting(mw.col, setting)
+
+    # save on Anki config object and leave saving to Anki
+    config['straightReward'] = asdict(setting)
+
 
 def add_straight_setting(dconf, _old) -> None:
     save_names = {c['name'] for c in mw.col.decks.allConf()}
