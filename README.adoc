@@ -1,4 +1,4 @@
-image::
+image:https://github.com/hgiesel/anki_straight_reward/workflows/Zip%20Anki%20add-ons/badge.svg[link="https://github.com/hgiesel/anki_straight_reward/actions?query=workflow%3A%22Zip+Anki+add-ons%22"]
 
 = Straight Reward
 
