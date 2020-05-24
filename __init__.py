@@ -13,6 +13,7 @@
 from aqt import mw
 import os.path as path
 
+# Write manifest.json to config.json
 if mw.addonManager.addonName(path.dirname(__file__)) != 'Straight Reward':
     dir_path = path.dirname(path.realpath(__file__))
 
