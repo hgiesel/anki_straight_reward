@@ -40,8 +40,6 @@ def sanity_check(conf: any) -> StraightSetting:
         'stop_ease': conf_val['stop_ease'] if 'stop_ease' in conf_val else DEFAULT_SETTINGS.stop_ease,
     })
 
-
-from aqt.utils import showInfo
 def get_setting_from_conf(conf) -> StraightSetting:
     result = sanity_check(conf)
     return result
