@@ -8,7 +8,7 @@ from anki.hooks import card_will_flush
 from anki.consts import BUTTON_THREE, BUTTON_FOUR
 from anki.cards import Card
 
-from ..utils import get_straight_len, get_easeplus, notifications_enabled
+from .logic import get_straight_len, get_easeplus, notifications_enabled
 
 def display_success(straightlen: int, easeplus: int):
     MSG = (

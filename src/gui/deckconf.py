@@ -1,7 +1,5 @@
 from PyQt5 import QtWidgets
 
-from dataclasses import asdict
-
 from aqt import mw
 from aqt.deckconf import DeckConf
 

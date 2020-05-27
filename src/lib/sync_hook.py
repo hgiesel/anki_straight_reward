@@ -11,7 +11,7 @@ from aqt.main import AnkiQt
 from aqt.gui_hooks import collection_did_load
 from aqt.utils import tooltip
 
-from ..utils import get_straight_len, get_easeplus
+from .logic import get_straight_len, get_easeplus
 
 base_path = mw.addonManager._userFilesPath(__name__.split('.')[0])
 
