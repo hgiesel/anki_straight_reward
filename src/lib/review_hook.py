@@ -5,10 +5,10 @@ from aqt.gui_hooks import reviewer_will_answer_card
 from aqt.utils import tooltip
 
 from anki.hooks import card_will_flush
-from anki.consts import BUTTON_THREE, BUTTON_FOUR
+from anki.consts import CARD_TYPE_REV, REVLOG_REV
 from anki.cards import Card
 
-from .logic import get_straight_len, get_easeplus, notifications_enabled
+from .logic import get_straight_len, get_easeplus, notifications_enabled, review_success
 
 def display_success(straightlen: int, easeplus: int):
     MSG = (
@@ -24,7 +24,9 @@ def review_hook_closure():
     def check_straight_reward(ease_tuple: Tuple[bool, int], _reviewer, card) -> Tuple[bool, int]:
         nonlocal gains
 
-        if ease_tuple[1] not in [BUTTON_THREE, BUTTON_FOUR]:
+        # check whether current review makes card qualify for straight reward
+        # CARD_TYPE_* does not match to REVLOG_*, because 3 is RELRN as card type, but CRAM as revlog
+        if card.type != CARD_TYPE_REV or not review_success((REVLOG_REV, ease_tuple[1])):
             return ease_tuple
 
         # check whether it is a filtered deck ("dynamic") which does not reschedule

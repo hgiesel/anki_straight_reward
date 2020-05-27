@@ -71,19 +71,15 @@ from ..config import  get_setting
 def get_easeplus(col: _Collection, card: Card, straightlen: int) -> int:
     sett = get_setting(col, card)
 
-    if (
-        sett.straight_length >= 1 and
-        straightlen >= sett.straight_length
-    ):
-        # easeplus of 0 will be falsy
-        return calculate_ease_change(
-            card,
-            sett.base_ease + (straightlen - sett.straight_length) * sett.step_ease,
-            sett.start_ease,
-            sett.stop_ease,
-        )
-
-    return 0
+    # easeplus of 0 will be falsy
+    return 0 if (
+        sett.straight_length == 0 or straightlen < sett.straight_length
+    ) else calculate_ease_change(
+        card,
+        sett.base_ease + (straightlen - sett.straight_length) * sett.step_ease,
+        sett.start_ease,
+        sett.stop_ease,
+    )
 
 def get_straight_len(col: _Collection, card_id: int, skip: int = 0) -> int:
     """Returns the length of the current straight from revlog"""
