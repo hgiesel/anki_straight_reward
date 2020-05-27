@@ -12,18 +12,18 @@ from anki.consts import (
     REVLOG_LRN, REVLOG_REV, REVLOG_RELRN, REVLOG_CRAM,
 )
 
-Button = Literal[
-    BUTTON_ONE, # Again
-    BUTTON_TWO, # Hard
-    BUTTON_THREE, # Good
-    BUTTON_FOUR, # Easy
+RevlogType = Literal[
+    REVLOG_LRN,   # 0
+    REVLOG_REV,   # 1
+    REVLOG_RELRN, # 2
+    REVLOG_CRAM,  # 3
 ]
 
-RevlogType = Literal[
-    REVLOG_LRN,
-    REVLOG_REV,
-    REVLOG_RELRN,
-    REVLOG_CRAM,
+Button = Literal[
+    BUTTON_ONE,   # Again 1
+    BUTTON_TWO,   # Hard  2
+    BUTTON_THREE, # Good  3
+    BUTTON_FOUR,  # Easy  4
 ]
 
 def review_success(v: Tuple[RevlogType, Button]) -> bool:
