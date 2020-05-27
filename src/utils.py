@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets, Qt
-from aqt import mw
 from anki.cards import Card
+from anki.collection import _Collection
 
 from enum import IntEnum
 from sys import maxsize
@@ -70,8 +70,8 @@ def calculate_ease_change(card: Card, reward: int, sett_min: int, sett_max: int)
 from .config import  get_setting
 
 # returns 250, NOT 2500
-def get_easeplus(card: Card, straightlen: int) -> int:
-    sett = get_setting(card)
+def get_easeplus(col: _Collection, card: Card, straightlen: int) -> int:
+    sett = get_setting(col, card)
 
     if (
         sett.straight_length >= 1 and
@@ -87,7 +87,7 @@ def get_easeplus(card: Card, straightlen: int) -> int:
 
     return 0
 
-def get_straight_len(col, card_id: int, skip: int = 0) -> int:
+def get_straight_len(col: _Collection, card_id: int, skip: int = 0) -> int:
     """Returns the length of the current straight from revlog"""
 
     eases = col.db.execute(
@@ -97,5 +97,5 @@ def get_straight_len(col, card_id: int, skip: int = 0) -> int:
 
     return straight_len(eases[skip:])
 
-def notifications_enabled(card: Card) -> bool:
-    return get_setting(card).enable_notifications
+def notifications_enabled(col: _Collection, card: Card) -> bool:
+    return get_setting(col, card).enable_notifications

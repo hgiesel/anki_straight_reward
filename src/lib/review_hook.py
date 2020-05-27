@@ -31,16 +31,16 @@ def review_hook_closure():
         if mw.col.decks.isDyn(card.did) and not mw.col.decks.get(card.did)['resched']:
             return ease_tuple
 
-        # plus One for the current success
+        # plus one for the current success
         straightlen = get_straight_len(mw.col, card.id) + 1
-        easeplus = get_easeplus(card, straightlen)
+        easeplus = get_easeplus(mw.col, card, straightlen)
 
         if not easeplus:
             return ease_tuple
 
         gains[card.id] = easeplus
 
-        if notifications_enabled(card):
+        if notifications_enabled(mw.col, card):
             display_success(straightlen, int(easeplus / 10))
 
         return ease_tuple

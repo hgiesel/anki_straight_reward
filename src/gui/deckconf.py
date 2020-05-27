@@ -12,11 +12,11 @@ from aqt.gui_hooks import (
 )
 
 from ..config import (
-    KEYWORD,
     StraightSetting,
-    get_setting,
-    get_setting_from_conf,
-    get_default_setting,
+    get_setting_from_config,
+    serialize_setting,
+    deserialize_setting,
+    write_setting,
 )
 
 def setup_reward_tab(dconf: DeckConf) -> None:
@@ -109,14 +109,14 @@ def load_reward_tab_with_setting(dconf: DeckConf, sett: StraightSetting) -> None
 
 def load_reward_tab(dconf: DeckConf, _deck, config) -> None:
     """Get the option for Straight Reward."""
-    straight_sett = get_setting_from_conf(config)
+    straight_sett = get_setting_from_config(mw.col, config)
     load_reward_tab_with_setting(dconf, straight_sett)
 
 def get_setting_from_reward_tab(dconf: DeckConf) -> StraightSetting:
     """Save the option for Straight Reward."""
     f = dconf.form
 
-    result = StraightSetting(
+    return deserialize_setting(
         f.straightLengthSpinBox.value(),
         f.straightEnableNotificationsCheckBox.isChecked(),
         f.straightBaseEaseSpinBox.value(),
@@ -125,11 +125,9 @@ def get_setting_from_reward_tab(dconf: DeckConf) -> StraightSetting:
         f.straightStopEaseSpinBox.value(),
     )
 
-    return result
-
 def save_reward_tab(dconf: DeckConf, _deck, config) -> None:
     setting = get_setting_from_reward_tab(dconf)
-    config[KEYWORD] = asdict(setting)
+    write_setting(mw.col, config, setting)
 
 def init_conf():
     deck_conf_did_setup_ui_form.append(setup_reward_tab)

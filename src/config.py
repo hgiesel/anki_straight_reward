@@ -1,7 +1,5 @@
-from dataclasses import fields
-
-from aqt import mw
 from anki.cards import Card
+from anki.collection import _Collection
 
 from .config_legacy import get_setting as get_legacy
 from .types import StraightSetting
@@ -9,44 +7,62 @@ from .types import StraightSetting
 DEFAULT_SETTINGS = StraightSetting(0, True, 15, 5, 130, 250)
 KEYWORD = 'straightReward'
 
-def fromdict(klass, d):
-    try:
-        fieldtypes = {
-            f.name: f.type for f in fields(klass)
-        }
+def serialize_setting(setting: StraightSetting) -> dict:
+    return {
+        'enableNotifications': setting.enable_notifications,
+        'straightLength': setting.straight_length,
+        'baseEase': setting.base_ease,
+        'stepEase': setting.step_ease,
+        'startEase': setting.start_ease,
+        'stopEase': setting.stop_ease,
+    }
 
-        return klass(**{
-            f: fromdict(fieldtypes[f], d[f]) for f in d
-        })
+def deserialize_setting(
+    straight_length: int,
+    enable_notifications: bool,
+    base_ease: int,
+    step_ease: int,
+    start_ease: int,
+    stop_ease: int,
+) -> StraightSetting:
+    return StraightSetting(
+        straight_length,
+        enable_notifications,
+        base_ease,
+        step_ease,
+        start_ease,
+        stop_ease,
+    )
 
-    except:
-        return d # Not a dataclass field
+def deserialize_setting_from_dict(setting_data: dict) -> StraightSetting:
+    return StraightSetting(
+        setting_data['straightLength'] if 'straightLength' in setting_data else DEFAULT_SETTINGS.straight_length,
+        setting_data['enableNotifications'] if 'enableNotifications' in setting_data else DEFAULT_SETTINGS.enable_notifications,
+        setting_data['baseEase'] if 'baseEase' in setting_data else DEFAULT_SETTINGS.base_ease,
+        setting_data['stepEase'] if 'stepEase' in setting_data else DEFAULT_SETTINGS.step_ease,
+        setting_data['startEase'] if 'startEase' in setting_data else DEFAULT_SETTINGS.start_ease,
+        setting_data['stopEase'] if 'stopEase' in setting_data else DEFAULT_SETTINGS.stop_ease,
+    )
 
-def sanity_check(conf: any) -> StraightSetting:
-    if KEYWORD not in conf:
-        return get_legacy(mw.col, conf['name'])
+def get_setting_from_config(col: _Collection, config) -> StraightSetting:
+    # TODO legacy check
+    if KEYWORD not in config:
+        return get_legacy(col, config['name'])
 
-    conf_val = conf[KEYWORD]
+    config_val = config[KEYWORD]
 
-    if type(conf_val) != dict:
-        return get_legacy(mw.col, conf['name'])
+    if type(config_val) != dict:
+        return get_legacy(col, config['name'])
 
-    return fromdict(StraightSetting, {
-        'straight_length': conf_val['straight_length'] if 'straight_length' in conf_val else DEFAULT_SETTINGS.straight_length,
-        'enable_notifications': conf_val['enable_notifications'] if 'enable_notifications' in conf_val else DEFAULT_SETTINGS.enable_notifications,
-        'base_ease': conf_val['base_ease'] if 'base_ease' in conf_val else DEFAULT_SETTINGS.base_ease,
-        'step_ease': conf_val['step_ease'] if 'step_ease' in conf_val else DEFAULT_SETTINGS.step_ease,
-        'start_ease': conf_val['start_ease'] if 'start_ease' in conf_val else DEFAULT_SETTINGS.start_ease,
-        'stop_ease': conf_val['stop_ease'] if 'stop_ease' in conf_val else DEFAULT_SETTINGS.stop_ease,
-    })
+    return deserialize_setting_from_dict(config_val)
 
-def get_setting_from_conf(conf) -> StraightSetting:
-    result = sanity_check(conf)
-    return result
-
-def get_setting(card: Card) -> StraightSetting:
-    conf = mw.col.decks.confForDid(card.odid or card.did)
-    return get_setting_from_conf(conf)
+def get_setting(col: _Collection, card: Card) -> StraightSetting:
+    config = col.decks.confForDid(card.odid or card.did)
+    return get_setting_from_config(col, config)
 
 def get_default_setting() -> StraightSetting:
     return DEFAULT_SETTINGS
+
+def write_setting(col: _Collection, config, setting: StraightSetting):
+    config[KEYWORD] = serialize_setting(setting)
+    col.decks.update_config(config)

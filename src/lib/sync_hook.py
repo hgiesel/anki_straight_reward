@@ -33,7 +33,7 @@ def display_sync_info(count: int):
 
 def check_cid(col, card: Card, skip) -> int:
     straightlen = get_straight_len(col, card.id, skip)
-    easeplus = get_easeplus(card, straightlen)
+    easeplus = get_easeplus(col, card, straightlen)
 
     card.factor += easeplus
     card.flush()
