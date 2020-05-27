@@ -35,4 +35,5 @@ if mw.addonManager.addonName(path.dirname(__file__)) != 'Straight Reward':
 
         mw.addonManager.writeAddonMeta(dir_path, meta)
 
-from .src import main
+from .src import init
+init()

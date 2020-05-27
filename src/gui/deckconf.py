@@ -127,7 +127,7 @@ def save_reward_tab(dconf: DeckConf, _deck, config) -> None:
     setting = get_setting_from_reward_tab(dconf)
     write_setting(mw.col, config, setting)
 
-def init_conf():
+def init_deckconf():
     deck_conf_did_setup_ui_form.append(setup_reward_tab)
     deck_conf_did_load_config.append(load_reward_tab)
     deck_conf_will_save_config.append(save_reward_tab)

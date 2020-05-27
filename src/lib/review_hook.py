@@ -6,9 +6,13 @@ from aqt.utils import tooltip
 
 from anki.hooks import card_will_flush
 from anki.consts import CARD_TYPE_REV, REVLOG_REV
+from anki.collection import _Collection
 from anki.cards import Card
 
-from .logic import get_straight_len, get_easeplus, notifications_enabled, review_success
+from .logic import (
+    get_straight_len, get_easeplus, notifications_enabled,
+    review_success, Button,
+)
 
 def display_success(straightlen: int, easeplus: int):
     MSG = (
@@ -18,19 +22,21 @@ def display_success(straightlen: int, easeplus: int):
 
     tooltip(MSG)
 
+def card_success(card: Card, answer: Button) -> bool:
+    # CARD_TYPE_* does not match to REVLOG_*, because 3 is RELRN as card type, but CRAM as revlog
+    return card.type == CARD_TYPE_REV and review_success((REVLOG_REV, answer))
+
+def from_rescheduling_deck(col: _Collection, card: Card) -> bool:
+    # check whether it is a filtered deck ("dynamic") which does not reschedule
+    return not col.decks.isDyn(card.did) or mw.col.decks.get(card.did)['resched']
+
 def review_hook_closure():
     gains = {}
 
-    def check_straight_reward(ease_tuple: Tuple[bool, int], _reviewer, card) -> Tuple[bool, int]:
+    def check_straight_reward(ease_tuple: Tuple[bool, int], _reviewer, card: Card) -> Tuple[bool, int]:
         nonlocal gains
 
-        # check whether current review makes card qualify for straight reward
-        # CARD_TYPE_* does not match to REVLOG_*, because 3 is RELRN as card type, but CRAM as revlog
-        if card.type != CARD_TYPE_REV or not review_success((REVLOG_REV, ease_tuple[1])):
-            return ease_tuple
-
-        # check whether it is a filtered deck ("dynamic") which does not reschedule
-        if mw.col.decks.isDyn(card.did) and not mw.col.decks.get(card.did)['resched']:
+        if not card_success(card, ease_tuple[1]) or not from_rescheduling_deck(mw.col, card):
             return ease_tuple
 
         # plus one for the current success
@@ -47,7 +53,7 @@ def review_hook_closure():
 
         return ease_tuple
 
-    def flush_with_straight_reward(card):
+    def flush_with_straight_reward(card: Card):
         nonlocal gains
 
         if card.id not in gains:
