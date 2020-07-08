@@ -63,7 +63,11 @@ def check_cids(col, reviewed_cids: List[int]) -> List[Tuple[int, int]]:
         # if a card was reviewed multiple times
         # we need to skip the most recent reviews for consideration
         for skip in range(inclusive_count):
-            card = Card(col, revcid)
+            try:
+                card = Card(col, revcid)
+            except AssertionError:
+                # card does exist in this db yet, probably created on another platform
+                pass
 
             # some cards do not have decks associated with them,
             # and in this case we don't know which straight settings to use, so ignore
