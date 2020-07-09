@@ -14,12 +14,11 @@ After installing the addon you will another option tab under the deck options ca
 <b>Calculating Ease Rewards</b>
 
 Formula for calculating the Ease Reward:
-<code>
-if strait_length &gt;= required_straight_length:
+<code>if strait_length &gt;= required_straight_length:
   base_reward + step_reward ⋅ (strait_length - required_straight_length)
 else:
-  0
-</code>
+  0</code>
+
 An Example:
 <ol><li>You rated a card "Good" for the sixth time in a row.</li><li>The card currently has an ease factor of 250%.</li><li>You have a straigth length of 4</li><li>You have a base reward of 15%</li><li>You have a step reward of 5%</li><li>You have a start ease of 130%</li><li>You have a stop ease of 270%</li></ol>
 So in this case we have a straight success (because 6 ≥ 4).
@@ -50,6 +49,14 @@ Applies when you do reviews on another platform (e.g. AnkiMobile or AnkiDroid) a
 
 All ease changes applied through the sync hook are logged in the addon folder under <code>user_files/sync_log</code>.
 
+<b>Important for users with multiple computers</b>
+
+If you use multiple computers with Desktop Anki, you should install Straight Reward only on one of these computers!
+Otherwise, reviews might get two, or even more rewards, because the sync hook is activated for each sync.
+If you need to work with multiple profiles on the same Anki installation, there is a global checkbox to deactivate the sync hook.
+
+<img src="https://raw.githubusercontent.com/hgiesel/anki_straight_reward/master/images/preferences.png"></img>
+
 If you have any problems or questions, consider <a href="https://github.com/hgiesel/anki_straight_reward" rel="nofollow">writing an issue on GitHub</a>, <a href="https://www.reddit.com/user/hgiesel" rel="nofollow">contacting me on Reddit</a>, or <a href="mailto:hengiesel@gmail.com">sending me a plain old email</a>.
 
 If you like <b>Straight Rewards</b>, don't forget to leave a thumbs up! If you like to support my work, you can <a href="https://ko-fi.com/hgiesel" rel="nofollow">buy me a coffee</a>.
@@ -60,4 +67,4 @@ Updates:
 * <a href="https://github.com/hgiesel/anki_straight_reward/releases/tag/v0.1" rel="nofollow">v0.1</a>. <a href="https://www.reddit.com/r/Anki/comments/fe1xne/fight_ease_hell_with_straight_reward/" rel="nofollow">On Reddit</a>.
 * <a href="https://github.com/hgiesel/anki_straight_reward/releases/tag/v0.2" rel="nofollow">v0.2</a>. <a href="https://github.com/hgiesel/anki_straight_reward/releases/tag/v0.2.1" rel="nofollow">v0.2.1</a>. <a href="https://github.com/hgiesel/anki_straight_reward/releases/tag/v0.2.2" rel="nofollow">v0.2.2</a>.
 * <a href="https://github.com/hgiesel/anki_straight_reward/releases/tag/v0.3.0" rel="nofollow">v0.3.0</a>. <a href="https://github.com/hgiesel/anki_straight_reward/releases/tag/v0.3.1" rel="nofollow">v0.3.1</a>.
-* <a href="https://github.com/hgiesel/anki_straight_reward/releases/tag/v0.4.0" rel="nofollow">v0.4.0</a>.  <a href="https://github.com/hgiesel/anki_straight_reward/releases/tag/v0.4.1" rel="nofollow">v0.4.1</a>.
+* <a href="https://github.com/hgiesel/anki_straight_reward/releases/tag/v0.4.0" rel="nofollow">v0.4.0</a>.  <a href="https://github.com/hgiesel/anki_straight_reward/releases/tag/v0.4.1" rel="nofollow">v0.4.1</a>. <a href="https://github.com/hgiesel/anki_straight_reward/releases/tag/v0.4.2" rel="nofollow">v0.4.2</a>.
