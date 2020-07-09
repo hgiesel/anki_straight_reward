@@ -17,83 +17,88 @@ from ..config import (
     write_setting,
 )
 
-def setup_reward_tab(dconf: DeckConf) -> None:
-    """Add an option tab for Straight Reward at Review section on Deckconf dialog."""
-    f = dconf.form
+def make_label(parent: QtWidgets.QWidget, text: str) -> QtWidgets.QLabel:
+    label = QtWidgets.QLabel(parent)
+    label.setText(_(text))
 
+    return label
+
+def make_spin_box(parent: QtWidgets.QWidget, minimum: int = 0, maximum: int = 999, suffix: str = '%') -> QtWidgets.QSpinBox:
+    spinBox = QtWidgets.QSpinBox(parent)
+    spinBox.setMinimum(minimum)
+    spinBox.setMaximum(maximum)
+    spinBox.setSuffix(suffix)
+
+    return spinBox
+
+def get_grid_layout(form) -> QtWidgets.QWidget:
     w = QtWidgets.QWidget()
-    f.gridLayout_straight = QtWidgets.QGridLayout()
-    f.gridLayout_straight.setColumnStretch(1, 5)
-    sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+
+    gridLayout = QtWidgets.QGridLayout()
+    gridLayout.setColumnStretch(1, 5)
+    gridLayout.setContentsMargins(0, 0, 0, 5)
 
     ##### STRAIGHT LENGTH
-    f.straightLengthLabel = QtWidgets.QLabel(w)
-    f.straightLengthLabel.setText(_('Begin at straight of length'))
-    f.gridLayout_straight.addWidget(f.straightLengthLabel, 1, 0, 1, 1)
+    form.straightLengthLabel = make_label(w, 'Begin at straight of length')
+    gridLayout.addWidget(form.straightLengthLabel, 1, 0, 1, 1)
 
-    f.straightLengthSpinBox = QtWidgets.QSpinBox(w)
-    f.straightLengthSpinBox.setMinimum(0)
-    f.straightLengthSpinBox.setMaximum(100)
-    f.gridLayout_straight.addWidget(f.straightLengthSpinBox, 1, 1, 1, 2)
-
-    ##### ENABLE NOTIFICATIONS
-    f.straightEnableNotificationsLabel = QtWidgets.QLabel(w)
-    f.straightEnableNotificationsLabel.setText(_('Enable notifications'))
-    f.gridLayout_straight.addWidget(f.straightEnableNotificationsLabel, 2, 0, 1, 1)
-
-    f.straightEnableNotificationsCheckBox = QtWidgets.QCheckBox(w)
-    f.gridLayout_straight.addWidget(f.straightEnableNotificationsCheckBox, 2, 1, 1, 2)
+    form.straightLengthSpinBox = make_spin_box(w, 0, 100, '')
+    gridLayout.addWidget(form.straightLengthSpinBox, 1, 1, 1, 2)
 
     ##### BASE EASE
-    f.straightBaseEaseLabel = QtWidgets.QLabel(w)
-    f.straightBaseEaseLabel.setText(_('Base ease reward'))
-    f.gridLayout_straight.addWidget(f.straightBaseEaseLabel, 3, 0, 1, 1)
+    form.straightBaseEaseLabel = make_label(w, 'Base ease reward')
+    gridLayout.addWidget(form.straightBaseEaseLabel, 2, 0, 1, 1)
 
-    f.straightBaseEaseSpinBox = QtWidgets.QSpinBox(w)
-    f.straightBaseEaseSpinBox.setSuffix('%')
-    f.straightBaseEaseSpinBox.setMinimum(0)
-    f.straightBaseEaseSpinBox.setMaximum(999)
-    f.gridLayout_straight.addWidget(f.straightBaseEaseSpinBox, 3, 1, 1, 2)
+    form.straightBaseEaseSpinBox = make_spin_box(w)
+    gridLayout.addWidget(form.straightBaseEaseSpinBox, 2, 1, 1, 2)
 
     ##### STEP EASE
-    f.straightStepEaseLabel = QtWidgets.QLabel(w)
-    f.straightStepEaseLabel.setText(_('Step ease reward'))
-    f.gridLayout_straight.addWidget(f.straightStepEaseLabel, 4, 0, 1, 1)
+    form.straightStepEaseLabel = make_label(w, 'Step ease reward')
+    gridLayout.addWidget(form.straightStepEaseLabel, 3, 0, 1, 1)
 
-    f.straightStepEaseSpinBox = QtWidgets.QSpinBox(w)
-    f.straightStepEaseSpinBox.setSuffix('%')
-    f.straightStepEaseSpinBox.setMinimum(0)
-    f.straightStepEaseSpinBox.setMaximum(999)
-    f.gridLayout_straight.addWidget(f.straightStepEaseSpinBox, 4, 1, 1, 2)
+    form.straightStepEaseSpinBox = make_spin_box(w)
+    gridLayout.addWidget(form.straightStepEaseSpinBox, 3, 1, 1, 2)
 
     ##### START EASE
-    f.straightStartEaseLabel = QtWidgets.QLabel(w)
-    f.straightStartEaseLabel.setText(_('Start at ease'))
-    f.gridLayout_straight.addWidget(f.straightStartEaseLabel, 5, 0, 1, 1)
+    form.straightStartEaseLabel = make_label(w, 'Start at ease')
+    gridLayout.addWidget(form.straightStartEaseLabel, 4, 0, 1, 1)
 
-    f.straightStartEaseSpinBox = QtWidgets.QSpinBox(w)
-    f.straightStartEaseSpinBox.setSuffix('%')
-    f.straightStartEaseSpinBox.setMinimum(130)
-    f.straightStartEaseSpinBox.setMaximum(999)
-    f.gridLayout_straight.addWidget(f.straightStartEaseSpinBox, 5, 1, 1, 2)
+    form.straightStartEaseSpinBox = make_spin_box(w, 130)
+    gridLayout.addWidget(form.straightStartEaseSpinBox, 4, 1, 1, 2)
 
     ##### STOP EASE
-    f.straightStopEaseLabel = QtWidgets.QLabel(w)
-    f.straightStopEaseLabel.setText(_('Stop at ease'))
-    f.gridLayout_straight.addWidget(f.straightStopEaseLabel, 6, 0, 1, 1)
+    form.straightStopEaseLabel = make_label(w, 'Stop at ease')
+    gridLayout.addWidget(form.straightStopEaseLabel, 5, 0, 1, 1)
 
-    f.straightStopEaseSpinBox = QtWidgets.QSpinBox(w)
-    f.straightStopEaseSpinBox.setSuffix('%')
-    f.straightStopEaseSpinBox.setMinimum(130)
-    f.straightStopEaseSpinBox.setMaximum(999)
-    f.gridLayout_straight.addWidget(f.straightStopEaseSpinBox, 6, 1, 1, 2)
+    form.straightStopEaseSpinBox = make_spin_box(w, 130)
+    gridLayout.addWidget(form.straightStopEaseSpinBox, 5, 1, 1, 2)
 
-    ##### VERTICAL SPACER
-    verticalSpacer = QtWidgets.QSpacerItem(20, 150, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-    f.gridLayout_straight.addItem(verticalSpacer)
+    w.setLayout(gridLayout)
 
-    w.setLayout(f.gridLayout_straight)
-    f.tabWidget.insertTab(2, w, 'Rewards')
+    return w
+
+def setup_reward_tab(dconf: DeckConf) -> None:
+    """Add an option tab for Straight Reward at Review section on Deckconf dialog."""
+    w = QtWidgets.QWidget()
+    form = dconf.form
+    form.horizontalLayout_straight = QtWidgets.QVBoxLayout()
+
+    ##### GRID LAYOUT
+    form.gridLayout_straight = get_grid_layout(form)
+    form.horizontalLayout_straight.addWidget(form.gridLayout_straight)
+
+    ##### ENABLE NOTIFICATIONS
+    form.straightEnableNotificationsCheckBox = QtWidgets.QCheckBox('Enable Notifications', w)
+    form.horizontalLayout_straight.addWidget(form.straightEnableNotificationsCheckBox)
+
+    ##### STRETCH
+    form.horizontalLayout_straight.addStretch()
+
+    ##### FINISH UP
+    w.setLayout(form.horizontalLayout_straight)
+
+    positionBetweenReviewsAndLapses = 2
+    form.tabWidget.insertTab(positionBetweenReviewsAndLapses, w, 'Rewards')
 
 def load_reward_tab_with_setting(dconf: DeckConf, sett: StraightSetting) -> None:
     f = dconf.form

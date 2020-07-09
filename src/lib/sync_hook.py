@@ -12,6 +12,7 @@ from aqt.gui_hooks import collection_did_load
 from aqt.utils import tooltip
 
 from .logic import get_straight_len, get_easeplus
+from ..utils import syncDisabledKeyword
 
 base_path = mw.addonManager._userFilesPath(__name__.split('.')[0])
 
@@ -85,11 +86,13 @@ def sync_hook_closure():
 
     def create_comparelog(self) -> None:
         path = self.pm.collectionPath()
-        col = Collection(path)
+        isDisabled = self.pm.profile.get(syncDisabledKeyword)
 
         # flatten ids
+        col = Collection(path)
+
         nonlocal oldids
-        oldids = [id for sublist in col.db.execute('SELECT id FROM revlog') for id in sublist]
+        oldids = [id for sublist in col.db.execute('SELECT id FROM revlog') for id in sublist] if not isDisabled else []
 
     def after_sync(col) -> None:
         nonlocal oldids
