@@ -68,7 +68,7 @@ def check_cids(col, reviewed_cids: List[int]) -> List[Tuple[int, int]]:
                 card = Card(col, revcid)
             except AssertionError:
                 # card does exist in this db yet, probably created on another platform
-                pass
+                continue
 
             # some cards do not have decks associated with them,
             # and in this case we don't know which straight settings to use, so ignore
