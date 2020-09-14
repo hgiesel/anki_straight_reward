@@ -84,36 +84,39 @@ def check_cids(col, reviewed_cids: List[int]) -> List[Tuple[int, int]]:
 def sync_hook_closure():
     oldids = []
 
-    def create_comparelog(self) -> None:
-        path = self.pm.collectionPath()
-        isDisabled = self.pm.profile.get(syncDisabledKeyword)
+    def create_comparelog(main: AnkiQt, _after_sync) -> None:
+        path = main.pm.collectionPath()
+        isDisabled = main.pm.profile.get(syncDisabledKeyword)
 
         # flatten ids
-        col = Collection(path)
-
         nonlocal oldids
-        oldids = [id for sublist in col.db.execute('SELECT id FROM revlog') for id in sublist] if not isDisabled else []
+        oldids = [id for sublist in main.col.db.execute('SELECT id FROM revlog') for id in sublist] if not isDisabled else []
 
-    def after_sync(col) -> None:
-        nonlocal oldids
+    def after_sync(main: AnkiQt, after_sync, _old) -> None:
+        def after():
+            nonlocal oldids
 
-        if len(oldids) == 0:
-            return
+            after_sync()
 
-        oldidstring = ','.join([str(oldid) for oldid in oldids])
-        oldids.clear()
+            if len(oldids) == 0:
+                return
 
-        # exclude entries where ivl == lastIvl: they indicate a dynamic deck without rescheduling
-        reviewed_cids = [cid for sublist in col.db.execute(f'SELECT cid FROM revlog WHERE id NOT IN ({oldidstring}) and ivl != lastIvl') for cid in sublist]
+            oldidstring = ','.join([str(oldid) for oldid in oldids])
+            oldids.clear()
 
-        result = check_cids(col, reviewed_cids)
+            # exclude entries where ivl == lastIvl: they indicate a dynamic deck without rescheduling
+            reviewed_cids = [cid for sublist in main.col.db.execute(f'SELECT cid FROM revlog WHERE id NOT IN ({oldidstring}) and ivl != lastIvl') for cid in sublist]
 
-        filtered_logs = [f"cid:{r[0]} easeplus:{r[1]}" for r in result if r[1] > 0]
-        filtered_length = len(filtered_logs)
+            result = check_cids(main.col, reviewed_cids)
 
-        if filtered_length > 0:
-            log_sync(col.crt, filtered_logs)
-            display_sync_info(filtered_length)
+            filtered_logs = [f"cid:{r[0]} easeplus:{r[1]}" for r in result if r[1] > 0]
+            filtered_length = len(filtered_logs)
+
+            if filtered_length > 0:
+                log_sync(main.col.crt, filtered_logs)
+                display_sync_info(filtered_length)
+
+        _old(main, lambda: after())
 
     return (
         create_comparelog,
@@ -123,5 +126,5 @@ def sync_hook_closure():
 def init_sync_hook():
     create, after = sync_hook_closure()
 
-    AnkiQt._sync = wrap(AnkiQt._sync, create, pos='before')
-    collection_did_load.append(after)
+    AnkiQt._sync_collection_and_media = wrap(AnkiQt._sync_collection_and_media, create, pos='before')
+    AnkiQt._sync_collection_and_media = wrap(AnkiQt._sync_collection_and_media, after, pos='around')
