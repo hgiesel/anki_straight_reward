@@ -96,8 +96,6 @@ def sync_hook_closure():
         def after():
             nonlocal oldids
 
-            after_sync()
-
             if len(oldids) == 0:
                 return
 
@@ -115,6 +113,8 @@ def sync_hook_closure():
             if filtered_length > 0:
                 log_sync(main.col.crt, filtered_logs)
                 display_sync_info(filtered_length)
+
+            after_sync()
 
         _old(main, lambda: after())
 
