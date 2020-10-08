@@ -14,7 +14,7 @@ from .logic import (
     get_easeplus,
 )
 
-from ..utils import syncDisabledKeyword
+from ..utils import syncDisabled
 
 
 base_path = mw.addonManager._userFilesPath(__name__.split('.')[0])
@@ -89,11 +89,10 @@ def sync_hook_closure():
 
     def create_comparelog() -> None:
         path = mw.pm.collectionPath()
-        isDisabled = mw.pm.profile.get(syncDisabledKeyword)
 
         # flatten ids
         nonlocal oldids
-        oldids = [id for sublist in mw.col.db.execute('SELECT id FROM revlog') for id in sublist] if not isDisabled else []
+        oldids = [id for sublist in mw.col.db.execute('SELECT id FROM revlog') for id in sublist] if not syncDisabled.value else []
 
     def after_sync() -> None:
         nonlocal oldids

@@ -1,6 +1,5 @@
-from PyQt5 import QtWidgets
-
 from aqt import mw
+from aqt.qt import QWidget, QLabel, QSpinBox, QCheckBox, QGridLayout, QVBoxLayout
 from aqt.deckconf import DeckConf
 
 from aqt.gui_hooks import (
@@ -17,24 +16,25 @@ from ..config import (
     write_setting,
 )
 
-def make_label(parent: QtWidgets.QWidget, text: str) -> QtWidgets.QLabel:
-    label = QtWidgets.QLabel(parent)
+
+def make_label(parent: QWidget, text: str) -> QLabel:
+    label = QLabel(parent)
     label.setText(_(text))
 
     return label
 
-def make_spin_box(parent: QtWidgets.QWidget, minimum: int = 0, maximum: int = 999, suffix: str = '%') -> QtWidgets.QSpinBox:
-    spinBox = QtWidgets.QSpinBox(parent)
+def make_spin_box(parent: QWidget, minimum: int = 0, maximum: int = 999, suffix: str = '%') -> QSpinBox:
+    spinBox = QSpinBox(parent)
     spinBox.setMinimum(minimum)
     spinBox.setMaximum(maximum)
     spinBox.setSuffix(suffix)
 
     return spinBox
 
-def get_grid_layout(form) -> QtWidgets.QWidget:
-    w = QtWidgets.QWidget()
+def get_grid_layout(form) -> QWidget:
+    w = QWidget()
 
-    gridLayout = QtWidgets.QGridLayout()
+    gridLayout = QGridLayout()
     gridLayout.setColumnStretch(1, 5)
     gridLayout.setContentsMargins(0, 0, 0, 5)
 
@@ -79,16 +79,16 @@ def get_grid_layout(form) -> QtWidgets.QWidget:
 
 def setup_reward_tab(dconf: DeckConf) -> None:
     """Add an option tab for Straight Reward at Review section on Deckconf dialog."""
-    w = QtWidgets.QWidget()
+    w = QWidget()
     form = dconf.form
-    form.horizontalLayout_straight = QtWidgets.QVBoxLayout()
+    form.horizontalLayout_straight = QVBoxLayout()
 
     ##### GRID LAYOUT
     form.gridLayout_straight = get_grid_layout(form)
     form.horizontalLayout_straight.addWidget(form.gridLayout_straight)
 
     ##### ENABLE NOTIFICATIONS
-    form.straightEnableNotificationsCheckBox = QtWidgets.QCheckBox('Enable Notifications', w)
+    form.straightEnableNotificationsCheckBox = QCheckBox('Enable Notifications', w)
     form.horizontalLayout_straight.addWidget(form.straightEnableNotificationsCheckBox)
 
     ##### STRETCH
