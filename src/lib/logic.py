@@ -5,12 +5,19 @@ from anki.collection import _Collection
 from enum import IntEnum
 from sys import maxsize
 from itertools import takewhile
-from typing import List, Tuple, Optional, Literal
+from typing import List, Tuple, Literal
 
 from anki.consts import (
-    BUTTON_ONE, BUTTON_TWO, BUTTON_THREE, BUTTON_FOUR,
-    REVLOG_LRN, REVLOG_REV, REVLOG_RELRN, REVLOG_CRAM,
+    BUTTON_ONE,
+    BUTTON_TWO,
+    BUTTON_THREE,
+    BUTTON_FOUR,
+    REVLOG_LRN,
+    REVLOG_REV,
+    REVLOG_RELRN,
+    REVLOG_CRAM,
 )
+
 
 RevlogType = Literal[
     REVLOG_LRN,   # 0

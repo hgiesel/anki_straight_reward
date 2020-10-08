@@ -2,17 +2,20 @@ from typing import List, Tuple, Dict
 from pathlib import Path
 from datetime import datetime
 
-from anki.hooks import wrap
-from anki.storage import Collection
+from anki.collection import Collection
 from anki.cards import Card
 
 from aqt import mw
-from aqt.main import AnkiQt
-from aqt.gui_hooks import collection_did_load
+from aqt.gui_hooks import sync_will_start, sync_did_finish
 from aqt.utils import tooltip
 
-from .logic import get_straight_len, get_easeplus
+from .logic import (
+    get_straight_len,
+    get_easeplus,
+)
+
 from ..utils import syncDisabledKeyword
+
 
 base_path = mw.addonManager._userFilesPath(__name__.split('.')[0])
 
@@ -32,7 +35,7 @@ def display_sync_info(count: int):
 
     tooltip(MSG)
 
-def check_cid(col, card: Card, skip) -> int:
+def check_cid(col: Collection, card: Card, skip) -> int:
     straightlen = get_straight_len(col, card.id, skip)
     easeplus = get_easeplus(col, card, straightlen)
 
@@ -53,7 +56,7 @@ def make_cid_counter(reviewed_cids: List[int]) -> Dict[int, int]:
 
     return cid_counter
 
-def check_cids(col, reviewed_cids: List[int]) -> List[Tuple[int, int]]:
+def check_cids(col: Collection, reviewed_cids: List[int]) -> List[Tuple[int, int]]:
     result = []
     cid_counter = make_cid_counter(reviewed_cids)
 
@@ -84,39 +87,34 @@ def check_cids(col, reviewed_cids: List[int]) -> List[Tuple[int, int]]:
 def sync_hook_closure():
     oldids = []
 
-    def create_comparelog(main: AnkiQt, _after_sync) -> None:
-        path = main.pm.collectionPath()
-        isDisabled = main.pm.profile.get(syncDisabledKeyword)
+    def create_comparelog() -> None:
+        path = mw.pm.collectionPath()
+        isDisabled = mw.pm.profile.get(syncDisabledKeyword)
 
         # flatten ids
         nonlocal oldids
-        oldids = [id for sublist in main.col.db.execute('SELECT id FROM revlog') for id in sublist] if not isDisabled else []
+        oldids = [id for sublist in mw.col.db.execute('SELECT id FROM revlog') for id in sublist] if not isDisabled else []
 
-    def after_sync(main: AnkiQt, after_sync, _old) -> None:
-        def after():
-            nonlocal oldids
+    def after_sync() -> None:
+        nonlocal oldids
 
-            if len(oldids) == 0:
-                return
+        if len(oldids) == 0:
+            return
 
-            oldidstring = ','.join([str(oldid) for oldid in oldids])
-            oldids.clear()
+        oldidstring = ','.join([str(oldid) for oldid in oldids])
+        oldids.clear()
 
-            # exclude entries where ivl == lastIvl: they indicate a dynamic deck without rescheduling
-            reviewed_cids = [cid for sublist in main.col.db.execute(f'SELECT cid FROM revlog WHERE id NOT IN ({oldidstring}) and ivl != lastIvl') for cid in sublist]
+        # exclude entries where ivl == lastIvl: they indicate a dynamic deck without rescheduling
+        reviewed_cids = [cid for sublist in mw.col.db.execute(f'SELECT cid FROM revlog WHERE id NOT IN ({oldidstring}) and ivl != lastIvl') for cid in sublist]
 
-            result = check_cids(main.col, reviewed_cids)
+        result = check_cids(mw.col, reviewed_cids)
 
-            filtered_logs = [f"cid:{r[0]} easeplus:{r[1]}" for r in result if r[1] > 0]
-            filtered_length = len(filtered_logs)
+        filtered_logs = [f"cid:{r[0]} easeplus:{r[1]}" for r in result if r[1] > 0]
+        filtered_length = len(filtered_logs)
 
-            if filtered_length > 0:
-                log_sync(main.col.crt, filtered_logs)
-                display_sync_info(filtered_length)
-
-            after_sync()
-
-        _old(main, lambda: after())
+        if filtered_length > 0:
+            log_sync(mw.col.crt, filtered_logs)
+            display_sync_info(filtered_length)
 
     return (
         create_comparelog,
@@ -126,5 +124,5 @@ def sync_hook_closure():
 def init_sync_hook():
     create, after = sync_hook_closure()
 
-    AnkiQt._sync_collection_and_media = wrap(AnkiQt._sync_collection_and_media, create, pos='before')
-    AnkiQt._sync_collection_and_media = wrap(AnkiQt._sync_collection_and_media, after, pos='around')
+    sync_will_start.append(create)
+    sync_did_finish.append(after)

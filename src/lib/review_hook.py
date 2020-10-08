@@ -6,13 +6,17 @@ from aqt.utils import tooltip
 
 from anki.hooks import card_will_flush
 from anki.consts import CARD_TYPE_REV, REVLOG_REV
-from anki.collection import _Collection
+from anki.collection import Collection
 from anki.cards import Card
 
 from .logic import (
-    get_straight_len, get_easeplus, notifications_enabled,
-    review_success, Button,
+    get_straight_len,
+    get_easeplus,
+    notifications_enabled,
+    review_success,
+    Button,
 )
+
 
 def display_success(straightlen: int, easeplus: int):
     MSG = (
@@ -26,7 +30,7 @@ def card_success(card: Card, answer: Button) -> bool:
     # CARD_TYPE_* does not match to REVLOG_*, because 3 is RELRN as card type, but CRAM as revlog
     return card.type == CARD_TYPE_REV and review_success((REVLOG_REV, answer))
 
-def from_rescheduling_deck(col: _Collection, card: Card) -> bool:
+def from_rescheduling_deck(col: Collection, card: Card) -> bool:
     # check whether it is a filtered deck ("dynamic") which does not reschedule
     return not col.decks.isDyn(card.did) or mw.col.decks.get(card.did)['resched']
 
