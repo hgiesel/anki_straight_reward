@@ -1,5 +1,5 @@
 from anki.cards import Card
-from anki.collection import _Collection
+from anki.collection import Collection
 
 from .types import StraightSetting
 
@@ -43,18 +43,19 @@ def deserialize_setting_from_dict(setting_data: dict) -> StraightSetting:
         setting_data['stopEase'] if 'stopEase' in setting_data else DEFAULT_SETTINGS.stop_ease,
     )
 
-def get_setting_from_config(col: _Collection, config) -> StraightSetting:
-    config_val = config[KEYWORD]
+def get_setting_from_config(config) -> StraightSetting:
+    try:
+        return deserialize_setting_from_dict(config[KEYWORD])
+    except:
+        return get_default_setting()
 
-    return deserialize_setting_from_dict(config_val)
-
-def get_setting(col: _Collection, card: Card) -> StraightSetting:
+def get_setting_from_col(col: Collection, card: Card) -> StraightSetting:
     config = col.decks.confForDid(card.odid or card.did)
-    return get_setting_from_config(col, config)
+    return get_setting_from_config(config)
 
 def get_default_setting() -> StraightSetting:
     return DEFAULT_SETTINGS
 
-def write_setting(col: _Collection, config, setting: StraightSetting):
+def write_setting(col: Collection, config, setting: StraightSetting):
     config[KEYWORD] = serialize_setting(setting)
     col.decks.update_config(config)

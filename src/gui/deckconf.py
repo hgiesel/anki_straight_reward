@@ -112,7 +112,7 @@ def load_reward_tab_with_setting(dconf: DeckConf, sett: StraightSetting) -> None
 
 def load_reward_tab(dconf: DeckConf, _deck, config) -> None:
     """Get the option for Straight Reward."""
-    straight_sett = get_setting_from_config(mw.col, config)
+    straight_sett = get_setting_from_config(config)
     load_reward_tab_with_setting(dconf, straight_sett)
 
 def get_setting_from_reward_tab(dconf: DeckConf) -> StraightSetting:
