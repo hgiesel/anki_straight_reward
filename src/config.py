@@ -1,7 +1,6 @@
 from anki.cards import Card
 from anki.collection import _Collection
 
-from .config_legacy import get_setting as get_legacy
 from .types import StraightSetting
 
 DEFAULT_SETTINGS = StraightSetting(0, True, 15, 5, 130, 250)
@@ -45,14 +44,7 @@ def deserialize_setting_from_dict(setting_data: dict) -> StraightSetting:
     )
 
 def get_setting_from_config(col: _Collection, config) -> StraightSetting:
-    # TODO legacy check
-    if KEYWORD not in config:
-        return get_legacy(col, config['name'])
-
     config_val = config[KEYWORD]
-
-    if type(config_val) != dict:
-        return get_legacy(col, config['name'])
 
     return deserialize_setting_from_dict(config_val)
 
