@@ -4,6 +4,7 @@ from datetime import datetime
 
 from anki.collection import Collection
 from anki.cards import Card
+from anki.rsbackend import NotFoundError
 
 from aqt import mw
 from aqt.gui_hooks import sync_will_start, sync_did_finish
@@ -71,6 +72,9 @@ def check_cids(col: Collection, reviewed_cids: List[int]) -> List[Tuple[int, int
                 card = Card(col, revcid)
             except AssertionError:
                 # card does exist in this db yet, probably created on another platform
+                continue
+            except NotFoundError:
+                # card was reviewed remotely, but deleted locally
                 continue
 
             # some cards do not have decks associated with them,
