@@ -56,28 +56,15 @@ def maybe_to_card(revcid: int) -> Optional[Card]:
         # card was reviewed remotely, but deleted locally
         return None
 
-def check_per_review(card: Card, count: int) -> List[int]:
-    # if a card was reviewed multiple times
-    # we need to skip the most recent reviews for consideration
-    result = []
-    for skip in range(count):
+def check_per_review(card: Card, skip: int) -> List[int]:
+    easeplus_shortened = check_cid(card, skip)
+    return (card.id, easeplus_shortened)
 
-        # some cards do not have decks associated with them,
-        # and in this case we don't know which straight settings to use, so ignore
-        did = card.odid or card.did
-        if not did:
-            continue
-
-        easeplus_shortened = check_cid(card, skip)
-        result.append((card.id, easeplus_shortened))
-
-    return result
-
-def check(data) -> List[int]:
-    revcid, count = data
-
+def check(revcid: int, count: int) -> List[int]:
     if card := maybe_to_card(revcid):
-        return check_per_review(card, count)
+        # if a card was reviewed multiple times
+        # we need to skip the most recent reviews for consideration
+        return map(lambda skip: check_per_review(card, skip), range(count))
 
     return []
 
@@ -85,10 +72,7 @@ def make_cid_counter(reviewed_cids: List[int]) -> Dict[int, int]:
     cid_counter = {}
 
     for cid in reviewed_cids:
-        if cid in cid_counter:
-            cid_counter[cid] += 1
-        else:
-            cid_counter[cid] = 1
+        cid_counter[cid] = cid_counter[cid] + 1 if cid in cid_counter else 1
 
     return cid_counter
 
@@ -99,7 +83,7 @@ def flat_map(f: Callable[[Any], List[Any]], xs: List[Any]) -> List[Any]:
     return ys
 
 def check_cids(reviewed_cids: List[int]) -> List[Tuple[int, int]]:
-    return flat_map(check, make_cid_counter(reviewed_cids).items())
+    return flat_map(lambda data: check(*data), make_cid_counter(reviewed_cids).items())
 
 def create_comparelog(oldids: List[int]) -> None:
     path = mw.pm.collectionPath()

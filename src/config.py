@@ -51,7 +51,9 @@ def get_setting_from_config(config) -> StraightSetting:
         return get_default_setting()
 
 def get_setting_from_card(card: Card) -> StraightSetting:
+    # confForDid resorts to conf for default deck if not available
     config = mw.col.decks.confForDid(card.odid or card.did)
+
     return get_setting_from_config(config)
 
 def get_default_setting() -> StraightSetting:
