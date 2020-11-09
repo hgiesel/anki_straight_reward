@@ -2,7 +2,7 @@ from typing import Any
 
 from aqt import mw
 
-version = 'v0.6.0'
+version = 'v0.6.1'
 
 class ProfileConfig:
     """Can be used for profile-specific settings"""
