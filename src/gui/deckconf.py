@@ -130,7 +130,7 @@ def get_setting_from_reward_tab(dconf: DeckConf) -> StraightSetting:
 
 def save_reward_tab(dconf: DeckConf, _deck, config) -> None:
     setting = get_setting_from_reward_tab(dconf)
-    write_setting(mw.col, config, setting)
+    write_setting(config, setting)
 
 def init_deckconf():
     deck_conf_did_setup_ui_form.append(setup_reward_tab)
