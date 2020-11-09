@@ -1,4 +1,4 @@
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Optional, Any, Callable
 from pathlib import Path
 from datetime import datetime
 
@@ -36,7 +36,7 @@ def display_sync_info(count: int):
 
     tooltip(MSG)
 
-def check_cid(card: Card, skip) -> int:
+def check_cid(card: Card, skip: int) -> int:
     straightlen = get_straight_len(card.id, skip)
     easeplus = get_easeplus(card, straightlen)
 
@@ -46,6 +46,41 @@ def check_cid(card: Card, skip) -> int:
     # short factor
     return int(easeplus / 10)
 
+def maybe_to_card(revcid: int) -> Optional[Card]:
+    try:
+        return Card(mw.col, revcid)
+    except AssertionError:
+        # card does exist in this db yet, probably created on another platform
+        return None
+    except NotFoundError:
+        # card was reviewed remotely, but deleted locally
+        return None
+
+def check_per_review(card: Card, count: int) -> List[int]:
+    # if a card was reviewed multiple times
+    # we need to skip the most recent reviews for consideration
+    result = []
+    for skip in range(count):
+
+        # some cards do not have decks associated with them,
+        # and in this case we don't know which straight settings to use, so ignore
+        did = card.odid or card.did
+        if not did:
+            continue
+
+        easeplus_shortened = check_cid(card, skip)
+        result.append((card.id, easeplus_shortened))
+
+    return result
+
+def check(data) -> List[int]:
+    revcid, count = data
+
+    if card := maybe_to_card(revcid):
+        return check_per_review(card, count)
+
+    return []
+
 def make_cid_counter(reviewed_cids: List[int]) -> Dict[int, int]:
     cid_counter = {}
 
@@ -53,40 +88,18 @@ def make_cid_counter(reviewed_cids: List[int]) -> Dict[int, int]:
         if cid in cid_counter:
             cid_counter[cid] += 1
         else:
-            cid_counter[cid] = 0
+            cid_counter[cid] = 1
 
     return cid_counter
 
+def flat_map(f: Callable[[Any], List[Any]], xs: List[Any]) -> List[Any]:
+    ys = []
+    for x in xs:
+        ys.extend(f(x))
+    return ys
+
 def check_cids(reviewed_cids: List[int]) -> List[Tuple[int, int]]:
-    result = []
-    cid_counter = make_cid_counter(reviewed_cids)
-
-    for revcid, count in cid_counter.items():
-        # python ending index is always exclusive
-        inclusive_count = count + 1
-
-        # if a card was reviewed multiple times
-        # we need to skip the most recent reviews for consideration
-        for skip in range(inclusive_count):
-            try:
-                card = Card(mw.col, revcid)
-            except AssertionError:
-                # card does exist in this db yet, probably created on another platform
-                continue
-            except NotFoundError:
-                # card was reviewed remotely, but deleted locally
-                continue
-
-            # some cards do not have decks associated with them,
-            # and in this case we don't know which straight settings to use, so ignore
-            did = card.odid or card.did
-            if not did:
-                continue
-
-            easeplus_shortened = check_cid(card, skip)
-            result.append((revcid, easeplus_shortened))
-
-    return result
+    return flat_map(check, make_cid_counter(reviewed_cids).items())
 
 def create_comparelog(oldids: List[int]) -> None:
     path = mw.pm.collectionPath()
