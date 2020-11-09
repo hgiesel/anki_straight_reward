@@ -88,44 +88,46 @@ def check_cids(col: Collection, reviewed_cids: List[int]) -> List[Tuple[int, int
 
     return result
 
-def sync_hook_closure():
-    oldids = []
+def create_comparelog(oldids: List[int]) -> None:
+    path = mw.pm.collectionPath()
 
-    def create_comparelog() -> None:
-        path = mw.pm.collectionPath()
+    # flatten ids
+    oldids.extend([
+        id
+        for sublist
+        in mw.col.db.execute('SELECT id FROM revlog')
+        for id
+        in sublist
+    ] if not syncDisabled.value else [])
 
-        # flatten ids
-        nonlocal oldids
-        oldids = [id for sublist in mw.col.db.execute('SELECT id FROM revlog') for id in sublist] if not syncDisabled.value else []
+def after_sync(oldids: List[int]) -> None:
+    if len(oldids) == 0:
+        return
 
-    def after_sync() -> None:
-        nonlocal oldids
+    oldidstring = ','.join([str(oldid) for oldid in oldids])
 
-        if len(oldids) == 0:
-            return
+    # exclude entries where ivl == lastIvl: they indicate a dynamic deck without rescheduling
+    reviewed_cids = [
+        cid
+        for sublist
+        in mw.col.db.execute(f'SELECT cid FROM revlog WHERE id NOT IN ({oldidstring}) and ivl != lastIvl')
+        for cid
+        in sublist
+    ]
 
-        oldidstring = ','.join([str(oldid) for oldid in oldids])
-        oldids.clear()
+    result = check_cids(mw.col, reviewed_cids)
 
-        # exclude entries where ivl == lastIvl: they indicate a dynamic deck without rescheduling
-        reviewed_cids = [cid for sublist in mw.col.db.execute(f'SELECT cid FROM revlog WHERE id NOT IN ({oldidstring}) and ivl != lastIvl') for cid in sublist]
+    filtered_logs = [f"cid:{r[0]} easeplus:{r[1]}" for r in result if r[1] > 0]
+    filtered_length = len(filtered_logs)
 
-        result = check_cids(mw.col, reviewed_cids)
+    if filtered_length > 0:
+        log_sync(mw.col.crt, filtered_logs)
+        display_sync_info(filtered_length)
 
-        filtered_logs = [f"cid:{r[0]} easeplus:{r[1]}" for r in result if r[1] > 0]
-        filtered_length = len(filtered_logs)
-
-        if filtered_length > 0:
-            log_sync(mw.col.crt, filtered_logs)
-            display_sync_info(filtered_length)
-
-    return (
-        create_comparelog,
-        after_sync,
-    )
+    oldids.clear()
 
 def init_sync_hook():
-    create, after = sync_hook_closure()
+    oldids = []
 
-    sync_will_start.append(create)
-    sync_did_finish.append(after)
+    sync_will_start.append(lambda: create_comparelog(oldids))
+    sync_did_finish.append(lambda: after_sync(oldids))
