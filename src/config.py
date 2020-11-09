@@ -1,5 +1,6 @@
 from anki.cards import Card
-from anki.collection import Collection
+
+from aqt import mw
 
 from .types import StraightSetting
 
@@ -49,13 +50,13 @@ def get_setting_from_config(config) -> StraightSetting:
     except:
         return get_default_setting()
 
-def get_setting_from_col(col: Collection, card: Card) -> StraightSetting:
-    config = col.decks.confForDid(card.odid or card.did)
+def get_setting_from_card(card: Card) -> StraightSetting:
+    config = mw.col.decks.confForDid(card.odid or card.did)
     return get_setting_from_config(config)
 
 def get_default_setting() -> StraightSetting:
     return DEFAULT_SETTINGS
 
-def write_setting(col: Collection, config, setting: StraightSetting):
+def write_setting(config, setting: StraightSetting):
     config[KEYWORD] = serialize_setting(setting)
-    col.decks.update_config(config)
+    mw.col.decks.update_config(config)

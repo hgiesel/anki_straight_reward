@@ -20,7 +20,7 @@ from anki.consts import (
     REVLOG_CRAM,
 )
 
-from ..config import  get_setting_from_col
+from ..config import  get_setting_from_card
 
 
 RevlogType = Literal[
@@ -78,7 +78,7 @@ def calculate_ease_change(card: Card, reward: int, sett_min: int, sett_max: int)
 
 # returns 250, NOT 2500
 def get_easeplus(card: Card, straightlen: int) -> int:
-    sett = get_setting_from_col(mw.col, card)
+    sett = get_setting_from_card(card)
 
     # easeplus of 0 will be falsy
     return 0 if (
@@ -100,5 +100,5 @@ def get_straight_len(card_id: int, skip: int = 0) -> int:
 
     return straight_len(eases[skip:])
 
-def notifications_enabled(col: Collection, card: Card) -> bool:
-    return get_setting_from_col(col, card).enable_notifications
+def notifications_enabled(card: Card) -> bool:
+    return get_setting_from_card(card).enable_notifications

@@ -47,7 +47,7 @@ def check_straight_reward(gains: dict, ease_tuple: Tuple[bool, int], card: Card)
 
     gains[card.id] = easeplus
 
-    if notifications_enabled(mw.col, card):
+    if notifications_enabled(card):
         display_success(straightlen, int(easeplus / 10))
 
     return ease_tuple
