@@ -30,12 +30,12 @@ def card_success(card: Card, answer: Button) -> bool:
     # CARD_TYPE_* does not match to REVLOG_*, because 3 is RELRN as card type, but CRAM as revlog
     return card.type == CARD_TYPE_REV and review_success((REVLOG_REV, answer))
 
-def from_rescheduling_deck(col: Collection, card: Card) -> bool:
+def from_rescheduling_deck(card: Card) -> bool:
     # check whether it is a filtered deck ("dynamic") which does not reschedule
-    return not col.decks.isDyn(card.did) or mw.col.decks.get(card.did)['resched']
+    return not mw.col.decks.isDyn(card.did) or mw.col.decks.get(card.did)['resched']
 
 def check_straight_reward(gains: dict, ease_tuple: Tuple[bool, int], card: Card) -> Tuple[bool, int]:
-    if not card_success(card, ease_tuple[1]) or not from_rescheduling_deck(mw.col, card):
+    if not card_success(card, ease_tuple[1]) or not from_rescheduling_deck(card):
         return ease_tuple
 
     # plus one for the current success

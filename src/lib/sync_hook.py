@@ -36,7 +36,7 @@ def display_sync_info(count: int):
 
     tooltip(MSG)
 
-def check_cid(col: Collection, card: Card, skip) -> int:
+def check_cid(card: Card, skip) -> int:
     straightlen = get_straight_len(card.id, skip)
     easeplus = get_easeplus(card, straightlen)
 
@@ -57,7 +57,7 @@ def make_cid_counter(reviewed_cids: List[int]) -> Dict[int, int]:
 
     return cid_counter
 
-def check_cids(col: Collection, reviewed_cids: List[int]) -> List[Tuple[int, int]]:
+def check_cids(reviewed_cids: List[int]) -> List[Tuple[int, int]]:
     result = []
     cid_counter = make_cid_counter(reviewed_cids)
 
@@ -69,7 +69,7 @@ def check_cids(col: Collection, reviewed_cids: List[int]) -> List[Tuple[int, int
         # we need to skip the most recent reviews for consideration
         for skip in range(inclusive_count):
             try:
-                card = Card(col, revcid)
+                card = Card(mw.col, revcid)
             except AssertionError:
                 # card does exist in this db yet, probably created on another platform
                 continue
@@ -83,7 +83,7 @@ def check_cids(col: Collection, reviewed_cids: List[int]) -> List[Tuple[int, int
             if not did:
                 continue
 
-            easeplus_shortened = check_cid(col, card, skip)
+            easeplus_shortened = check_cid(card, skip)
             result.append((revcid, easeplus_shortened))
 
     return result
@@ -115,7 +115,7 @@ def after_sync(oldids: List[int]) -> None:
         in sublist
     ]
 
-    result = check_cids(mw.col, reviewed_cids)
+    result = check_cids(reviewed_cids)
 
     filtered_logs = [f"cid:{r[0]} easeplus:{r[1]}" for r in result if r[1] > 0]
     filtered_length = len(filtered_logs)
