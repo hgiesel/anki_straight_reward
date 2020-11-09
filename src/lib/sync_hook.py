@@ -37,8 +37,8 @@ def display_sync_info(count: int):
     tooltip(MSG)
 
 def check_cid(col: Collection, card: Card, skip) -> int:
-    straightlen = get_straight_len(col, card.id, skip)
-    easeplus = get_easeplus(col, card, straightlen)
+    straightlen = get_straight_len(card.id, skip)
+    easeplus = get_easeplus(card, straightlen)
 
     card.factor += easeplus
     card.flush()

@@ -39,8 +39,8 @@ def check_straight_reward(gains: dict, ease_tuple: Tuple[bool, int], card: Card)
         return ease_tuple
 
     # plus one for the current success
-    straightlen = get_straight_len(mw.col, card.id) + 1
-    easeplus = get_easeplus(mw.col, card, straightlen)
+    straightlen = get_straight_len(card.id) + 1
+    easeplus = get_easeplus(card, straightlen)
 
     if not easeplus:
         return ease_tuple

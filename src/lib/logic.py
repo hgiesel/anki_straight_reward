@@ -7,6 +7,8 @@ from sys import maxsize
 from itertools import takewhile
 from typing import List, Tuple, Literal
 
+from aqt import mw
+
 from anki.consts import (
     BUTTON_ONE,
     BUTTON_TWO,
@@ -17,6 +19,8 @@ from anki.consts import (
     REVLOG_RELRN,
     REVLOG_CRAM,
 )
+
+from ..config import  get_setting_from_col
 
 
 RevlogType = Literal[
@@ -72,11 +76,9 @@ def calculate_ease_change(card: Card, reward: int, sett_min: int, sett_max: int)
     else:
         return 0
 
-from ..config import  get_setting_from_col
-
 # returns 250, NOT 2500
-def get_easeplus(col: Collection, card: Card, straightlen: int) -> int:
-    sett = get_setting_from_col(col, card)
+def get_easeplus(card: Card, straightlen: int) -> int:
+    sett = get_setting_from_col(mw.col, card)
 
     # easeplus of 0 will be falsy
     return 0 if (
@@ -88,10 +90,10 @@ def get_easeplus(col: Collection, card: Card, straightlen: int) -> int:
         sett.stop_ease,
     )
 
-def get_straight_len(col: Collection, card_id: int, skip: int = 0) -> int:
+def get_straight_len(card_id: int, skip: int = 0) -> int:
     """Returns the length of the current straight from revlog"""
 
-    eases = col.db.execute(
+    eases = mw.col.db.execute(
         "SELECT type, ease FROM revlog WHERE cid = ? AND ivl != lastIvl ORDER BY id DESC",
         card_id,
     )
