@@ -4,7 +4,7 @@ from aqt import mw
 
 from .types import StraightSetting
 
-DEFAULT_SETTINGS = StraightSetting(0, True, 15, 5, 130, 250)
+DEFAULT_SETTINGS = StraightSetting(2, True, 5, 5, 130, 250)
 KEYWORD = "straightReward"
 
 
