@@ -23,13 +23,17 @@ def make_label(parent: QWidget, text: str) -> QLabel:
 
     return label
 
-def make_spin_box(parent: QWidget, minimum: int = 0, maximum: int = 999, suffix: str = '%') -> QSpinBox:
+
+def make_spin_box(
+    parent: QWidget, minimum: int = 0, maximum: int = 999, suffix: str = "%"
+) -> QSpinBox:
     spinBox = QSpinBox(parent)
     spinBox.setMinimum(minimum)
     spinBox.setMaximum(maximum)
     spinBox.setSuffix(suffix)
 
     return spinBox
+
 
 def get_grid_layout(form) -> QWidget:
     w = QWidget()
@@ -39,35 +43,35 @@ def get_grid_layout(form) -> QWidget:
     gridLayout.setContentsMargins(0, 0, 0, 5)
 
     ##### STRAIGHT LENGTH
-    form.straightLengthLabel = make_label(w, 'Begin at straight of length')
+    form.straightLengthLabel = make_label(w, "Begin at straight of length")
     gridLayout.addWidget(form.straightLengthLabel, 1, 0, 1, 1)
 
-    form.straightLengthSpinBox = make_spin_box(w, 0, 100, '')
+    form.straightLengthSpinBox = make_spin_box(w, 0, 100, "")
     gridLayout.addWidget(form.straightLengthSpinBox, 1, 1, 1, 2)
 
     ##### BASE EASE
-    form.straightBaseEaseLabel = make_label(w, 'Base ease reward')
+    form.straightBaseEaseLabel = make_label(w, "Base ease reward")
     gridLayout.addWidget(form.straightBaseEaseLabel, 2, 0, 1, 1)
 
     form.straightBaseEaseSpinBox = make_spin_box(w)
     gridLayout.addWidget(form.straightBaseEaseSpinBox, 2, 1, 1, 2)
 
     ##### STEP EASE
-    form.straightStepEaseLabel = make_label(w, 'Step ease reward')
+    form.straightStepEaseLabel = make_label(w, "Step ease reward")
     gridLayout.addWidget(form.straightStepEaseLabel, 3, 0, 1, 1)
 
     form.straightStepEaseSpinBox = make_spin_box(w)
     gridLayout.addWidget(form.straightStepEaseSpinBox, 3, 1, 1, 2)
 
     ##### START EASE
-    form.straightStartEaseLabel = make_label(w, 'Start at ease')
+    form.straightStartEaseLabel = make_label(w, "Start at ease")
     gridLayout.addWidget(form.straightStartEaseLabel, 4, 0, 1, 1)
 
     form.straightStartEaseSpinBox = make_spin_box(w, 130)
     gridLayout.addWidget(form.straightStartEaseSpinBox, 4, 1, 1, 2)
 
     ##### STOP EASE
-    form.straightStopEaseLabel = make_label(w, 'Stop at ease')
+    form.straightStopEaseLabel = make_label(w, "Stop at ease")
     gridLayout.addWidget(form.straightStopEaseLabel, 5, 0, 1, 1)
 
     form.straightStopEaseSpinBox = make_spin_box(w, 130)
@@ -76,6 +80,7 @@ def get_grid_layout(form) -> QWidget:
     w.setLayout(gridLayout)
 
     return w
+
 
 def setup_reward_tab(dconf: DeckConf) -> None:
     """Add an option tab for Straight Reward at Review section on Deckconf dialog."""
@@ -88,7 +93,7 @@ def setup_reward_tab(dconf: DeckConf) -> None:
     form.horizontalLayout_straight.addWidget(form.gridLayout_straight)
 
     ##### ENABLE NOTIFICATIONS
-    form.straightEnableNotificationsCheckBox = QCheckBox('Enable Notifications', w)
+    form.straightEnableNotificationsCheckBox = QCheckBox("Enable Notifications", w)
     form.horizontalLayout_straight.addWidget(form.straightEnableNotificationsCheckBox)
 
     ##### STRETCH
@@ -98,7 +103,8 @@ def setup_reward_tab(dconf: DeckConf) -> None:
     w.setLayout(form.horizontalLayout_straight)
 
     positionBetweenReviewsAndLapses = 2
-    form.tabWidget.insertTab(positionBetweenReviewsAndLapses, w, 'Rewards')
+    form.tabWidget.insertTab(positionBetweenReviewsAndLapses, w, "Rewards")
+
 
 def load_reward_tab_with_setting(dconf: DeckConf, sett: StraightSetting) -> None:
     f = dconf.form
@@ -110,10 +116,12 @@ def load_reward_tab_with_setting(dconf: DeckConf, sett: StraightSetting) -> None
     f.straightStartEaseSpinBox.setValue(sett.start_ease)
     f.straightStopEaseSpinBox.setValue(sett.stop_ease)
 
+
 def load_reward_tab(dconf: DeckConf, _deck, config) -> None:
     """Get the option for Straight Reward."""
     straight_sett = get_setting_from_config(config)
     load_reward_tab_with_setting(dconf, straight_sett)
+
 
 def get_setting_from_reward_tab(dconf: DeckConf) -> StraightSetting:
     """Save the option for Straight Reward."""
@@ -128,9 +136,11 @@ def get_setting_from_reward_tab(dconf: DeckConf) -> StraightSetting:
         f.straightStopEaseSpinBox.value(),
     )
 
+
 def save_reward_tab(dconf: DeckConf, _deck, config) -> None:
     setting = get_setting_from_reward_tab(dconf)
     write_setting(config, setting)
+
 
 def init_deckconf():
     deck_conf_did_setup_ui_form.append(setup_reward_tab)

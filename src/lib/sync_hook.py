@@ -18,14 +18,16 @@ from .logic import (
 from ..utils import syncDisabled
 
 
-base_path = mw.addonManager._userFilesPath(__name__.split('.')[0])
+base_path = mw.addonManager._userFilesPath(__name__.split(".")[0])
+
 
 def log_sync(crt: int, logs: List[str]) -> None:
-    sync_log = Path(base_path) / Path('sync_log')
+    sync_log = Path(base_path) / Path("sync_log")
 
-    with sync_log.open('at') as f:
+    with sync_log.open("at") as f:
         f.write(f"### Ease Changes applied in collection {crt} on {datetime.now()}:\n")
-        f.write('\n'.join(logs) + '\n')
+        f.write("\n".join(logs) + "\n")
+
 
 def display_sync_info(count: int):
     MSG = (
@@ -35,6 +37,7 @@ def display_sync_info(count: int):
     )
 
     tooltip(MSG)
+
 
 def check_cid(card: Card, skip: int) -> int:
     straightlen = get_straight_len(card.id, skip)
@@ -46,6 +49,7 @@ def check_cid(card: Card, skip: int) -> int:
     # short factor
     return int(easeplus / 10)
 
+
 def maybe_to_card(revcid: int) -> Optional[Card]:
     try:
         return Card(mw.col, revcid)
@@ -56,9 +60,11 @@ def maybe_to_card(revcid: int) -> Optional[Card]:
         # card was reviewed remotely, but deleted locally
         return None
 
+
 def check_per_review(card: Card, skip: int) -> List[int]:
     easeplus_shortened = check_cid(card, skip)
     return (card.id, easeplus_shortened)
+
 
 def check(revcid: int, count: int) -> List[int]:
     if card := maybe_to_card(revcid):
@@ -68,6 +74,7 @@ def check(revcid: int, count: int) -> List[int]:
 
     return []
 
+
 def make_cid_counter(reviewed_cids: List[int]) -> Dict[int, int]:
     cid_counter = {}
 
@@ -76,40 +83,42 @@ def make_cid_counter(reviewed_cids: List[int]) -> Dict[int, int]:
 
     return cid_counter
 
+
 def flat_map(f: Callable[[Any], List[Any]], xs: List[Any]) -> List[Any]:
     ys = []
     for x in xs:
         ys.extend(f(x))
     return ys
 
+
 def check_cids(reviewed_cids: List[int]) -> List[Tuple[int, int]]:
     return flat_map(lambda data: check(*data), make_cid_counter(reviewed_cids).items())
+
 
 def create_comparelog(oldids: List[int]) -> None:
     path = mw.pm.collectionPath()
 
     # flatten ids
-    oldids.extend([
-        id
-        for sublist
-        in mw.col.db.execute('SELECT id FROM revlog')
-        for id
-        in sublist
-    ] if not syncDisabled.value else [])
+    oldids.extend(
+        [id for sublist in mw.col.db.execute("SELECT id FROM revlog") for id in sublist]
+        if not syncDisabled.value
+        else []
+    )
+
 
 def after_sync(oldids: List[int]) -> None:
     if len(oldids) == 0:
         return
 
-    oldidstring = ','.join([str(oldid) for oldid in oldids])
+    oldidstring = ",".join([str(oldid) for oldid in oldids])
 
     # exclude entries where ivl == lastIvl: they indicate a dynamic deck without rescheduling
     reviewed_cids = [
         cid
-        for sublist
-        in mw.col.db.execute(f'SELECT cid FROM revlog WHERE id NOT IN ({oldidstring}) and ivl != lastIvl')
-        for cid
-        in sublist
+        for sublist in mw.col.db.execute(
+            f"SELECT cid FROM revlog WHERE id NOT IN ({oldidstring}) and ivl != lastIvl"
+        )
+        for cid in sublist
     ]
 
     result = check_cids(reviewed_cids)
@@ -122,6 +131,7 @@ def after_sync(oldids: List[int]) -> None:
         display_sync_info(filtered_length)
 
     oldids.clear()
+
 
 def init_sync_hook():
     oldids = []

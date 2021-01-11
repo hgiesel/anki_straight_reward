@@ -2,7 +2,8 @@ from typing import Any
 
 from aqt import mw
 
-version = 'v0.6.1'
+version = "v0.6.1"
+
 
 class ProfileConfig:
     """Can be used for profile-specific settings"""
@@ -26,4 +27,5 @@ class ProfileConfig:
             # same behavior as Collection.remove_config
             pass
 
-syncDisabled = ProfileConfig('straightRewardOnSyncDisabled', False)
+
+syncDisabled = ProfileConfig("straightRewardOnSyncDisabled", False)

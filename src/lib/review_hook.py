@@ -26,15 +26,20 @@ def display_success(straightlen: int, easeplus: int):
 
     tooltip(MSG)
 
+
 def card_success(card: Card, answer: Button) -> bool:
     # CARD_TYPE_* does not match to REVLOG_*, because 3 is RELRN as card type, but CRAM as revlog
     return card.type == CARD_TYPE_REV and review_success((REVLOG_REV, answer))
 
+
 def from_rescheduling_deck(card: Card) -> bool:
     # check whether it is a filtered deck ("dynamic") which does not reschedule
-    return not mw.col.decks.isDyn(card.did) or mw.col.decks.get(card.did)['resched']
+    return not mw.col.decks.isDyn(card.did) or mw.col.decks.get(card.did)["resched"]
 
-def check_straight_reward(gains: dict, ease_tuple: Tuple[bool, int], card: Card) -> Tuple[bool, int]:
+
+def check_straight_reward(
+    gains: dict, ease_tuple: Tuple[bool, int], card: Card
+) -> Tuple[bool, int]:
     if not card_success(card, ease_tuple[1]) or not from_rescheduling_deck(card):
         return ease_tuple
 
@@ -52,6 +57,7 @@ def check_straight_reward(gains: dict, ease_tuple: Tuple[bool, int], card: Card)
 
     return ease_tuple
 
+
 def flush_with_straight_reward(gains: dict, card: Card) -> None:
     if card.id not in gains:
         return
@@ -59,11 +65,14 @@ def flush_with_straight_reward(gains: dict, card: Card) -> None:
     card.factor += gains[card.id]
     del gains[card.id]
 
+
 def init_review_hook():
     gains = {}
 
     reviewer_will_answer_card.append(
-        lambda ease_tuple, _reviewer, card: check_straight_reward(gains, ease_tuple, card),
+        lambda ease_tuple, _reviewer, card: check_straight_reward(
+            gains, ease_tuple, card
+        ),
     )
 
     card_will_flush.append(
