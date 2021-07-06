@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-declare DIR="$(cd "$(dirname "$0")/.." && pwd -P)"
+declare DIR="$(cd "$(dirname "$0")/.." && pwd -P)/dist"
 declare addon_name="StraightRewardDev"
 declare customdir=''
 

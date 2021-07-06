@@ -9,12 +9,6 @@ else
   declare addon_id='straight_reward'
 fi
 
-cd "$DIR"
+cd "$DIR/dist"
 
-zip -r "$DIR/build/$addon_id.ankiaddon" \
-  "manifest.json" \
-  "user_files/README.md" \
-  "__init__.py" \
-  "src/"*".py" \
-  "src/lib/"*".py" \
-  "src/gui/"*".py" \
+zip -r "$DIR/build/$addon_id.ankiaddon" *
