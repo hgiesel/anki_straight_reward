@@ -12,8 +12,8 @@
 <TitledContainer title="Rewards">
     <SpinBoxRow
         bind:value={$data.straightLength}
-        defaultValue={1}
-        markdownTooltip=""
+        defaultValue={2}
+        markdownTooltip="Length of what is considered a straight success. Starting at this length, ease rewards will be applied. The value 0 is the same as deactivating Straight Rewards."
     >
         Begin at straight of length
     </SpinBoxRow>
@@ -21,7 +21,7 @@
     <SpinBoxFloatRow
         bind:value={$data.baseEase}
         defaultValue={0.05}
-        markdownTooltip=""
+        markdownTooltip="The ease reward is calculated as: BaseEase + StepEase ⋅ (StraightLength - RequiredStraightLength)"
     >
         Base ease reward
     </SpinBoxFloatRow>
@@ -29,7 +29,7 @@
     <SpinBoxFloatRow
         bind:value={$data.stepEase}
         defaultValue={0.05}
-        markdownTooltip=""
+        markdownTooltip="The ease reward is calculated as: BaseEase + StepEase ⋅ (StraightLength - RequiredStraightLength)"
     >
         Step ease reward
     </SpinBoxFloatRow>
@@ -37,7 +37,7 @@
     <SpinBoxFloatRow
         bind:value={$data.startEase}
         defaultValue={1.30}
-        markdownTooltip=""
+        markdownTooltip="Only cards with an ease factor between (inclusive) *Start Ease* and *Stop Ease* are considered for ease rewards."
     >
         Start at ease
     </SpinBoxFloatRow>
@@ -45,7 +45,7 @@
     <SpinBoxFloatRow
         bind:value={$data.stopEase}
         defaultValue={2.50}
-        markdownTooltip=""
+        markdownTooltip="Only cards with an ease factor between (inclusive) *Start Ease* and *Stop Ease* are considered for ease rewards."
     >
         Stop at ease
     </SpinBoxFloatRow>
@@ -53,7 +53,7 @@
     <SwitchRow
         bind:value={$data.enableNotification}
         defaultValue={true}
-        markdownTooltip=""
+        markdownTooltip="Enable or disable the notifications that arise during review."
     >
         Enable notification
     </SwitchRow>
