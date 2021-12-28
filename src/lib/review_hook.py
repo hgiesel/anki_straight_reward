@@ -6,7 +6,6 @@ from aqt.utils import tooltip
 
 from anki.hooks import card_will_flush
 from anki.consts import CARD_TYPE_REV, REVLOG_REV
-from anki.collection import Collection
 from anki.cards import Card
 
 from .logic import (

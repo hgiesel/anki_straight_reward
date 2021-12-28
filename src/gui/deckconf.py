@@ -1,6 +1,6 @@
-from aqt import mw
 from aqt.qt import QWidget, QLabel, QSpinBox, QCheckBox, QGridLayout, QVBoxLayout
 from aqt.deckconf import DeckConf
+from anki.lang import _
 
 from aqt.gui_hooks import (
     deck_conf_did_load_config,
@@ -11,7 +11,6 @@ from aqt.gui_hooks import (
 from ..config import (
     StraightSetting,
     get_setting_from_config,
-    serialize_setting,
     deserialize_setting,
     write_setting,
 )
