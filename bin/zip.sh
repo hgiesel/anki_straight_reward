@@ -11,4 +11,4 @@ fi
 
 cd "$DIR/dist"
 
-zip -r "$DIR/build/$addon_id.ankiaddon" *
+zip -r "$DIR/build/$addon_id.ankiaddon" * -x '*__pycache__*'
