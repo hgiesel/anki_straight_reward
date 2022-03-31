@@ -34,7 +34,7 @@ def card_success(card: Card, answer: Button) -> bool:
 
 def from_rescheduling_deck(card: Card) -> bool:
     # check whether it is a filtered deck ("dynamic") which does not reschedule
-    return not mw.col.decks.isDyn(card.did) or mw.col.decks.get(card.did)["resched"]
+    return not mw.col.decks.is_filtered(card.did) or mw.col.decks.get(card.did)["resched"]
 
 
 def check_straight_reward(

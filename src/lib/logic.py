@@ -1,4 +1,3 @@
-from PyQt5 import QtWidgets, Qt
 from anki.cards import Card
 from anki.collection import Collection
 
