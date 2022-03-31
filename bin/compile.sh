@@ -7,8 +7,9 @@ rm -rf "$DIR/dist/*"
 # done
 
 cp -rf "$DIR/__init__.py" \
-  "$DIR/src" \
   "$DIR/manifest.json" \
+  "$DIR/src" \
+  "$DIR/user_files" \
   "$DIR/dist"
 
 yarn --cwd "$DIR/web" build
