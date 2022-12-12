@@ -70,3 +70,8 @@ Applies when you do reviews on another platform (e.g. AnkiMobile or AnkiDroid) a
 image::./images/sync_notification.png[align="center"]
 
 All ease changes applied through the sync hook are logged in the addon folder under `user_files/sync_log`.
+
+== Building
+
+1. Run `yarn && yarn build` in `/web`
+1. Run `./tools/compile.sh`
