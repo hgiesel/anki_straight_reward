@@ -1,6 +1,6 @@
 from typing import Tuple
 
-from aqt import mw
+from aqt import mw, appVersion
 from aqt.gui_hooks import (
     reviewer_will_answer_card,
     reviewer_did_answer_card,
@@ -22,6 +22,7 @@ from .logic import (
     Button,
 )
 
+anki_version = tuple(int(p) for p in appVersion.split("."))
 
 def display_success(straightlen: int, easeplus: int):
     MSG = (
@@ -61,14 +62,20 @@ def check_straight_reward(
         return
 
     if reviewer._v3:
-        next_states = reviewer.get_next_states()
+        if anki_version >= (2, 1, 55):
+            next_states = reviewer.get_scheduling_states()
+        else:
+            next_states = reviewer.get_next_states()
 
         if rating == 3:
             next_states.good.normal.review.ease_factor += easeplus / 1000
         else:
             next_states.easy.normal.review.ease_factor += easeplus / 1000
 
-        reviewer.set_next_states(reviewer._state_mutation_key, next_states)
+        if anki_version >= (2, 1, 55):
+            reviewer.set_scheduling_states(reviewer._state_mutation_key, next_states)
+        else:
+            reviewer.set_next_states(reviewer._state_mutation_key, next_states)
     else:
         gains[card.id] = easeplus
 
