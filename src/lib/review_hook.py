@@ -13,6 +13,7 @@ from anki.hooks import card_will_flush
 from anki.consts import CARD_TYPE_REV, REVLOG_REV
 from anki.collection import Collection
 from anki.cards import Card
+from anki.scheduler.v3 import SetSchedulingStatesRequest
 
 from .logic import (
     get_straight_len,
@@ -67,7 +68,11 @@ def check_straight_reward(
         else:
             next_states.easy.normal.review.ease_factor += easeplus / 1000
 
-        reviewer.set_scheduling_states(reviewer._state_mutation_key, next_states)
+        request = SetSchedulingStatesRequest(
+            key=reviewer._state_mutation_key,
+            states=next_states,
+        )
+        reviewer.set_scheduling_states(request)
     else:
         gains[card.id] = easeplus
 
