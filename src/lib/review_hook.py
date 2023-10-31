@@ -1,17 +1,10 @@
-from typing import Tuple
-
 from aqt import mw
-from aqt.gui_hooks import (
-    reviewer_will_answer_card,
-    reviewer_did_answer_card,
-    review_did_undo,
-)
+from aqt.gui_hooks import reviewer_will_answer_card
 
 from aqt.utils import tooltip
 
 from anki.hooks import card_will_flush
 from anki.consts import CARD_TYPE_REV, REVLOG_REV
-from anki.collection import Collection
 from anki.cards import Card
 from anki.scheduler.v3 import SetSchedulingStatesRequest
 
