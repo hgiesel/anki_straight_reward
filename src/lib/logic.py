@@ -1,8 +1,6 @@
 from anki.cards import Card
-from anki.collection import Collection
+from aqt.qt import *
 
-from enum import IntEnum
-from sys import maxsize
 from itertools import takewhile
 from typing import List, Tuple, Literal
 

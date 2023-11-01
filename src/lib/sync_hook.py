@@ -2,7 +2,6 @@ from typing import List, Tuple, Dict, Optional, Any, Callable
 from pathlib import Path
 from datetime import datetime
 
-from anki.collection import Collection
 from anki.cards import Card
 from anki.rsbackend import NotFoundError
 
